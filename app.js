@@ -663,7 +663,145 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Initialize Login State
+    initLoginState();
 });
+
+// =========================================
+// LOGIN & ACCESS CONTROL
+// =========================================
+const ALLOWED_CLASSES = ['CB196', 'CB201', 'CB202', 'B209'];
+
+function initLoginState() {
+    const loginOverlay = document.getElementById('loginOverlay');
+    const appContainer = document.getElementById('appContainer');
+    const studentNameInput = document.getElementById('studentName');
+    const studentClassInput = document.getElementById('studentClass');
+    const btnLogin = document.getElementById('btnLogin');
+
+    if (!loginOverlay || !appContainer) return;
+
+    // Pre-fill previously saved info if any
+    const savedName = localStorage.getItem('vstep_b2_student_name') || '';
+    const savedClass = localStorage.getItem('vstep_b2_student_class') || '';
+    if (studentNameInput && savedName) studentNameInput.value = savedName;
+    if (studentClassInput && savedClass) studentClassInput.value = savedClass;
+
+    // Check session login state
+    const isSessionLoggedIn = sessionStorage.getItem('vstep_b2_session_logged_in');
+    if (isSessionLoggedIn === 'true') {
+        loginOverlay.style.display = 'none';
+        appContainer.style.display = 'flex';
+    } else {
+        loginOverlay.style.display = 'flex';
+        appContainer.style.display = 'none';
+    }
+
+    if (btnLogin) {
+        btnLogin.addEventListener('click', handleLogin);
+    }
+
+    if (studentNameInput) {
+        studentNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (studentClassInput && !studentClassInput.value.trim()) {
+                    studentClassInput.focus();
+                } else {
+                    handleLogin();
+                }
+            }
+        });
+    }
+
+    if (studentClassInput) {
+        studentClassInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+    }
+}
+
+function handleLogin() {
+    const studentNameInput = document.getElementById('studentName');
+    const studentClassInput = document.getElementById('studentClass');
+    const loginError = document.getElementById('loginError');
+    const btnLogin = document.getElementById('btnLogin');
+    const loginOverlay = document.getElementById('loginOverlay');
+    const appContainer = document.getElementById('appContainer');
+
+    const nameVal = studentNameInput ? studentNameInput.value.trim() : '';
+    const rawClassVal = studentClassInput ? studentClassInput.value.trim().toUpperCase().replace(/\s+/g, '') : '';
+
+    if (!nameVal) {
+        showLoginError('Vui lòng nhập đầy đủ Họ và tên.');
+        if (studentNameInput) studentNameInput.focus();
+        return;
+    }
+
+    if (!rawClassVal || !ALLOWED_CLASSES.includes(rawClassVal)) {
+        showLoginError('Mã lớp không hợp lệ. Chỉ chấp nhận lớp: CB196, CB201, CB202, B209.');
+        if (studentClassInput) studentClassInput.focus();
+        return;
+    }
+
+    if (loginError) loginError.style.display = 'none';
+
+    if (btnLogin) {
+        btnLogin.textContent = 'ĐANG ĐĂNG NHẬP...';
+        btnLogin.disabled = true;
+    }
+
+    // Prepare Google Form submission
+    const formEntryInfo = document.getElementById('formEntryInfo');
+    const googleForm = document.getElementById('googleForm');
+    const combinedData = `${nameVal} - Lớp ${rawClassVal}`;
+
+    if (formEntryInfo) formEntryInfo.value = combinedData;
+
+    // Submit via hidden form iframe
+    try {
+        if (googleForm) googleForm.submit();
+    } catch (err) {
+        console.warn('Form submit error:', err);
+    }
+
+    // Submit via fetch no-cors as additional reliable channel
+    try {
+        const formData = new FormData();
+        formData.append('entry.388968236', combinedData);
+        fetch('https://docs.google.com/forms/d/e/1FAIpQLSdbWEXCNWwUKM5B1gVK889PvPpYdmJ6wTERVcyplNHE0CUbEw/formResponse', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: formData
+        }).catch(() => {});
+    } catch (e) {}
+
+    // Save info
+    localStorage.setItem('vstep_b2_student_name', nameVal);
+    localStorage.setItem('vstep_b2_student_class', rawClassVal);
+    localStorage.setItem('vstep_b2_student_info', combinedData);
+    sessionStorage.setItem('vstep_b2_session_logged_in', 'true');
+
+    // Unlock App
+    setTimeout(() => {
+        if (loginOverlay) loginOverlay.style.display = 'none';
+        if (appContainer) appContainer.style.display = 'flex';
+        if (btnLogin) {
+            btnLogin.textContent = 'BẮT ĐẦU HỌC NGAY';
+            btnLogin.disabled = false;
+        }
+    }, 300);
+}
+
+function showLoginError(msg) {
+    const loginError = document.getElementById('loginError');
+    if (loginError) {
+        loginError.textContent = msg;
+        loginError.style.display = 'block';
+    }
+}
 
 // Hàm hiển thị bản dịch tiếng Việt
 window.toggleTranslation = function(btn) {
@@ -676,3 +814,4 @@ window.toggleTranslation = function(btn) {
         btn.innerHTML = '<i class="fa-solid fa-language"></i> Xem bản dịch tiếng Việt';
     }
 };
+
