@@ -678,6 +678,7 @@ function initLoginState() {
     const appContainer = document.getElementById('appContainer');
     const studentNameInput = document.getElementById('studentName');
     const studentClassInput = document.getElementById('studentClass');
+    const studentPasswordInput = document.getElementById('studentPassword');
     const btnLogin = document.getElementById('btnLogin');
 
     if (!loginOverlay || !appContainer) return;
@@ -707,6 +708,8 @@ function initLoginState() {
             if (e.key === 'Enter') {
                 if (studentClassInput && !studentClassInput.value.trim()) {
                     studentClassInput.focus();
+                } else if (studentPasswordInput && !studentPasswordInput.value.trim()) {
+                    studentPasswordInput.focus();
                 } else {
                     handleLogin();
                 }
@@ -717,6 +720,18 @@ function initLoginState() {
     if (studentClassInput) {
         studentClassInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
+                if (studentPasswordInput && !studentPasswordInput.value.trim()) {
+                    studentPasswordInput.focus();
+                } else {
+                    handleLogin();
+                }
+            }
+        });
+    }
+
+    if (studentPasswordInput) {
+        studentPasswordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
                 handleLogin();
             }
         });
@@ -726,6 +741,7 @@ function initLoginState() {
 function handleLogin() {
     const studentNameInput = document.getElementById('studentName');
     const studentClassInput = document.getElementById('studentClass');
+    const studentPasswordInput = document.getElementById('studentPassword');
     const loginError = document.getElementById('loginError');
     const btnLogin = document.getElementById('btnLogin');
     const loginOverlay = document.getElementById('loginOverlay');
@@ -733,6 +749,7 @@ function handleLogin() {
 
     const nameVal = studentNameInput ? studentNameInput.value.trim() : '';
     const rawClassVal = studentClassInput ? studentClassInput.value.trim().toUpperCase().replace(/\s+/g, '') : '';
+    const passwordVal = studentPasswordInput ? studentPasswordInput.value.trim() : '';
 
     if (!nameVal) {
         showLoginError('Vui lòng nhập đầy đủ Họ và tên.');
@@ -743,6 +760,21 @@ function handleLogin() {
     if (!rawClassVal || !ALLOWED_CLASSES.includes(rawClassVal)) {
         showLoginError('Mã lớp không hợp lệ. Chỉ chấp nhận lớp: CB196, CB201, CB202, B209.');
         if (studentClassInput) studentClassInput.focus();
+        return;
+    }
+
+    if (!passwordVal) {
+        showLoginError('Vui lòng nhập Mật khẩu.');
+        if (studentPasswordInput) studentPasswordInput.focus();
+        return;
+    }
+
+    if (passwordVal !== 'VSTEPSEPTEMBER') {
+        showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
+        if (studentPasswordInput) {
+            studentPasswordInput.focus();
+            studentPasswordInput.select();
+        }
         return;
     }
 
