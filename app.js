@@ -671,7 +671,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // =========================================
 // LOGIN & ACCESS CONTROL
 // =========================================
-const ALLOWED_CLASSES = ['CB196', 'CB201', 'CB202', 'B209'];
+const ALLOWED_CLASSES = ['CB196', 'CB201', 'CB202', 'B209', 'CB206', 'CB210', 'GV'];
+
+function cleanAccessPassword(pwd) {
+    return (pwd || '')
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, '')
+        .replace(/Ư/g, 'W')
+        .replace(/Ơ/g, 'OW')
+        .replace(/Ê/g, 'E');
+}
 
 function initLoginState() {
     const loginOverlay = document.getElementById('loginOverlay');
@@ -680,8 +690,26 @@ function initLoginState() {
     const studentClassInput = document.getElementById('studentClass');
     const studentPasswordInput = document.getElementById('studentPassword');
     const btnLogin = document.getElementById('btnLogin');
+    const btnTogglePwd = document.getElementById('btnTogglePwd');
+    const togglePwdIcon = document.getElementById('togglePwdIcon');
 
     if (!loginOverlay || !appContainer) return;
+
+    // Password toggle
+    if (btnTogglePwd && studentPasswordInput) {
+        btnTogglePwd.addEventListener('click', () => {
+            const isPwd = (studentPasswordInput.type === 'password');
+            studentPasswordInput.type = isPwd ? 'text' : 'password';
+            btnTogglePwd.title = isPwd ? 'Ẩn mật khẩu' : 'Hiện mật khẩu';
+            if (togglePwdIcon) {
+                if (isPwd) {
+                    togglePwdIcon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+                } else {
+                    togglePwdIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+                }
+            }
+        });
+    }
 
     // Pre-fill previously saved info if any
     const savedName = localStorage.getItem('vstep_b2_student_name') || '';
@@ -757,31 +785,45 @@ function handleLogin() {
         return;
     }
 
-    if (!rawClassVal || !ALLOWED_CLASSES.includes(rawClassVal)) {
-        showLoginError('Mã lớp không hợp lệ. Chỉ chấp nhận lớp: CB196, CB201, CB202, B209.');
-        if (studentClassInput) studentClassInput.focus();
-        return;
-    }
+    const normName = nameVal.toUpperCase();
+    let finalClassVal = rawClassVal;
+    const isTeacher = (normName === 'PTMN' && (finalClassVal === 'GV' || !finalClassVal)) || (normName === 'PTMN' && finalClassVal === 'GV');
 
-    if (!passwordVal) {
-        showLoginError('Vui lòng nhập Mật khẩu.');
-        if (studentPasswordInput) studentPasswordInput.focus();
-        return;
-    }
-
-    if (passwordVal !== 'VSTEPSEPTEMBER') {
-        showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
-        if (studentPasswordInput) {
-            studentPasswordInput.focus();
-            studentPasswordInput.select();
+    if (isTeacher) {
+        if (!finalClassVal) finalClassVal = 'GV';
+    } else {
+        if (finalClassVal === 'GV') {
+            showLoginError('Mã lớp GV chỉ dành riêng cho tài khoản Giáo viên (PTMN)!');
+            if (studentNameInput) studentNameInput.focus();
+            return;
         }
-        return;
+
+        if (!finalClassVal || !ALLOWED_CLASSES.includes(finalClassVal)) {
+            showLoginError(`Mã lớp không hợp lệ. Chỉ chấp nhận các lớp: ${ALLOWED_CLASSES.filter(c => c !== 'GV').join(', ')}.`);
+            if (studentClassInput) studentClassInput.focus();
+            return;
+        }
+
+        if (!passwordVal) {
+            showLoginError('Vui lòng nhập Mật khẩu.');
+            if (studentPasswordInput) studentPasswordInput.focus();
+            return;
+        }
+
+        if (cleanAccessPassword(passwordVal) !== 'STUDYHARD') {
+            showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
+            if (studentPasswordInput) {
+                studentPasswordInput.focus();
+                studentPasswordInput.select();
+            }
+            return;
+        }
     }
 
     if (loginError) loginError.style.display = 'none';
 
     if (btnLogin) {
-        btnLogin.textContent = 'ĐANG ĐĂNG NHẬP...';
+        btnLogin.innerHTML = '<span>ĐANG ĐĂNG NHẬP...</span>';
         btnLogin.disabled = true;
     }
 
@@ -811,9 +853,9 @@ function handleLogin() {
     } catch (e) {}
 
     // Save info
-    localStorage.setItem('vstep_b2_student_name', nameVal);
-    localStorage.setItem('vstep_b2_student_class', rawClassVal);
-    localStorage.setItem('vstep_b2_student_info', combinedData);
+    localStorage.setItem('vstep_b2_student_name', isTeacher ? 'PTMN' : nameVal);
+    localStorage.setItem('vstep_b2_student_class', finalClassVal);
+    localStorage.setItem('vstep_b2_student_info', `${isTeacher ? 'PTMN' : nameVal} - Lớp ${finalClassVal}`);
     sessionStorage.setItem('vstep_b2_session_logged_in', 'true');
 
     // Unlock App
@@ -821,7 +863,7 @@ function handleLogin() {
         if (loginOverlay) loginOverlay.style.display = 'none';
         if (appContainer) appContainer.style.display = 'flex';
         if (btnLogin) {
-            btnLogin.textContent = 'BẮT ĐẦU HỌC NGAY';
+            btnLogin.innerHTML = '<span>BẮT ĐẦU HỌC</span> <i class="fa-solid fa-arrow-right"></i>';
             btnLogin.disabled = false;
         }
     }, 300);
