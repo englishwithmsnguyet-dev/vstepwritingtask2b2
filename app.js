@@ -671,7 +671,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // =========================================
 // LOGIN & ACCESS CONTROL
 // =========================================
-const ALLOWED_CLASSES = ['CB196', 'CB201', 'CB202', 'B209', 'CB206', 'CB210', 'GV'];
+const ALLOWED_CLASSES = ['CB196', 'B209', 'CB206', 'CB210', 'GV'];
+const BANNED_CLASSES = ['CB201', 'CB202', 'B220'];
 
 function cleanAccessPassword(pwd) {
     return (pwd || '')
@@ -795,6 +796,12 @@ function handleLogin() {
         if (finalClassVal === 'GV') {
             showLoginError('Mã lớp GV chỉ dành riêng cho tài khoản Giáo viên (PTMN)!');
             if (studentNameInput) studentNameInput.focus();
+            return;
+        }
+
+        if (BANNED_CLASSES.includes(finalClassVal)) {
+            showLoginError(`Lớp ${finalClassVal} đã kết thúc khóa học và không được phép đăng nhập!`);
+            if (studentClassInput) studentClassInput.focus();
             return;
         }
 
