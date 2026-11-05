@@ -1705,7 +1705,7 @@ h1, h2, h3, h4, h5, h6 {
     inset: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(15, 23, 42, 0.85);
+    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #e0f2fe 100%);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;
@@ -1982,43 +1982,44 @@ h1, h2, h3, h4, h5, h6 {
     color: #1877f2;
 }
 
-/* Dark Mode Adaptation for Login */
+/* Always Bright Login Card (even in dark mode) */
 [data-theme="dark"] .login-card-custom {
-    background-color: #1e293b !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.25) !important;
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), 0 0 35px rgba(99, 102, 241, 0.14) !important;
 }
 
 [data-theme="dark"] .login-title-custom {
-    color: #f8fafc !important;
+    color: #0f172a !important;
 }
 
 [data-theme="dark"] .input-group-custom label {
-    color: #e2e8f0 !important;
+    color: #0f172a !important;
 }
 
 [data-theme="dark"] .input-group-custom input {
-    background: #0f172a !important;
-    border-color: #334155 !important;
-    color: #f8fafc !important;
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
 }
 
 [data-theme="dark"] .input-group-custom input:focus {
-    border-color: #818cf8 !important;
-    background: #1e293b !important;
-    box-shadow: 0 0 0 3.5px rgba(129, 140, 248, 0.2) !important;
+    border-color: #6366f1 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: 0 0 0 3.5px rgba(99, 102, 241, 0.18) !important;
 }
 
 [data-theme="dark"] .btn-toggle-pwd {
-    color: #94a3b8 !important;
+    color: #64748b !important;
 }
 
 [data-theme="dark"] .btn-toggle-pwd:hover {
-    color: #a5b4fc !important;
+    color: #4f46e5 !important;
 }
 
 [data-theme="dark"] .login-teacher-avatar {
-    border-color: #1e293b !important;
+    border-color: #ffffff !important;
 }
 
 [data-theme="dark"] .login-teacher-badge {

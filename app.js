@@ -671,8 +671,61 @@ document.addEventListener('DOMContentLoaded', () => {
 // =========================================
 // LOGIN & ACCESS CONTROL
 // =========================================
-const ALLOWED_CLASSES = ['CB196', 'B209', 'CB206', 'CB210', 'GV'];
-const BANNED_CLASSES = ['CB201', 'CB202', 'B220'];
+const ALLOWED_CLASSES = ['CB210', 'CB211', 'CB213', 'ONB103', 'B212', 'B2', 'GV'];
+const BANNED_CLASSES = ['CB201', 'CB202', 'B220', 'CB206', 'CB196', 'B209'];
+
+const STUDENTS_BY_CLASS = {
+    'CB210': [
+        "Nguyễn Võ Thành Đạt", "Lê Huỳnh Thanh Duy", "Nguyễn Cao Kỳ Duyên", "Đào Ngọc Hân",
+        "Trần Văn Hữu", "Trần Văn Kim Khoa", "Nguyễn Thanh Nâng", "Huỳnh Kỳ Nguyên",
+        "Võ Thị Kim Nguyên", "Võ Hùng Sanh", "Tiền Thị Thanh Thảo", "Trần Thị Thanh Thảo",
+        "Đặng Thị Kim Thoa", "Trần Thị Tiên Tiên", "Lê Kim Tuyền"
+    ],
+    'CB211': [
+        "Hồ Anh Quân", "Lê Thành Nghiệp", "Lê Khánh Lâm", "Huỳnh Thị Ngọc Thắm",
+        "Mai Trần Xuân Mai", "Lê Thị Uyển Nhi", "Nguyễn Thụy Thanh Trúc"
+    ],
+    'CB213': [
+        "Nguyễn Quốc Anh", "Hoàng Hợp Minh Châu", "Đặng Châu Gia Huy", "Trần Minh Tuệ Mẩn",
+        "Trần Minh Tuệẫn", "Đặng Thị Trúc Măng", "Trương Thị Kha My", "Ngô Diễm My",
+        "Chiêm Chúc Ngân", "Huỳnh Thị Yến Nhi", "Phạm Nguyễn Tâm Như", "Phạm Nhựt Tiến",
+        "Phạm Nhật Tiến", "Lê Thị Tú Trinh", "Trần Ngọc Vinh"
+    ],
+    'ONB103': [
+        "Nguyễn Thị Duy", "Phạm Trần Mỹ Hân", "Trịnh Thị Thu Hiền", "Nguyễn Hoàng Kha",
+        "Phạm Thị Út Lụa", "Phạm Thị Út Lua", "Lê Huỳnh Diễm My", "Nguyễn Thị Ngọc Mỹ",
+        "Huỳnh Thị Kim Ngân", "Trần Thị Kim Ngân", "Nguyễn Thị Tiểu Phụng", "Trần Yến Phụng",
+        "Phạm Ngọc Thạch", "Cao Thị Thu Trang", "Nguyễn Thị Thanh Tuyền", "Trần Phạm Phương Uyên",
+        "Trần Ngô Mỹ Vy"
+    ],
+    'B212': [
+        "Nguyễn Duy Hồng Anh", "Nguyễn Ngọc Minh Anh", "Nguyễn Lê Mỹ Hân", "Nguyễn Hồng Minh Huy",
+        "Nguyễn Quốc Khải", "Đoàn Nguyễn Đình Khang", "Lê Nguyễn Gia Khánh", "Nguyễn Hữu Khánh",
+        "Hồ Thị Ngọc Lan", "Trần Thị Hồng Lỉnh", "Trần Thị Hồng Lĩnh", "Võ Thị Triệu Minh",
+        "Hứa Đình Nghi", "Võ Thị Bảo Ngọc", "Lê Tiến Phát", "Nguyễn Hoàng Thông",
+        "Trần Hoàng Thông", "Nguyễn Kim Tiền", "Lê Thị Bảo Trân", "Võ Thị Diễm Trinh",
+        "Nguyễn Tấn Trung", "Nguyễn Tiến Trung", "Trần Thị Ánh Tuyết", "Đặng Nguyễn Khánh Uyên",
+        "Nguyễn Thị Chúc Yến"
+    ],
+    'B2': [
+        "Gia Tuệ", "Gia Tuê", "Nguyễn Gia Tuệ", "Trần Gia Tuệ", "Lê Gia Tuệ"
+    ]
+};
+
+function removeVietnameseTonesB2(str) {
+    return (str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+}
+
+function normalizeNameB2(str) {
+    return (str || '')
+        .normalize('NFC')
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+}
 
 function cleanAccessPassword(pwd) {
     return (pwd || '')
@@ -787,28 +840,60 @@ function handleLogin() {
     }
 
     const normName = nameVal.toUpperCase();
-    let finalClassVal = rawClassVal;
-    const isTeacher = (normName === 'PTMN' && (finalClassVal === 'GV' || !finalClassVal)) || (normName === 'PTMN' && finalClassVal === 'GV');
+    const noToneName = removeVietnameseTonesB2(normalizeNameB2(nameVal));
+    let finalClassVal = rawClassVal.replace(/^(LỚP|LOP|CLASS)\s*/i, '');
+    const noToneClass = removeVietnameseTonesB2(finalClassVal.toLowerCase()).replace(/[^a-z0-9]/g, '').toUpperCase();
+    if (noToneClass === 'B2' || noToneClass.includes('GIATUE')) {
+        finalClassVal = 'B2';
+    } else {
+        finalClassVal = noToneClass;
+    }
+
+    const isTeacher = (
+        normName === 'PTMN' ||
+        noToneName.includes('co nguyet') ||
+        noToneName.includes('miss nguyet') ||
+        noToneName.includes('pham thi minh nguyet') ||
+        finalClassVal === 'GV' ||
+        cleanAccessPassword(passwordVal) === 'PTMN'
+    );
+    let finalStudentName = isTeacher ? (nameVal || 'PTMN') : nameVal;
 
     if (isTeacher) {
         if (!finalClassVal) finalClassVal = 'GV';
     } else {
-        if (finalClassVal === 'GV') {
-            showLoginError('Mã lớp GV chỉ dành riêng cho tài khoản Giáo viên (PTMN)!');
-            if (studentNameInput) studentNameInput.focus();
-            return;
-        }
-
-        if (BANNED_CLASSES.includes(finalClassVal)) {
-            showLoginError(`Lớp ${finalClassVal} đã kết thúc khóa học và không được phép đăng nhập!`);
-            if (studentClassInput) studentClassInput.focus();
-            return;
-        }
-
         if (!finalClassVal || !ALLOWED_CLASSES.includes(finalClassVal)) {
-            showLoginError(`Mã lớp không hợp lệ. Chỉ chấp nhận các lớp: ${ALLOWED_CLASSES.filter(c => c !== 'GV').join(', ')}.`);
+            showLoginError('Hệ thống hiện chỉ mở cho các lớp: CB210, CB211, CB213, ONB103, B212 và Gia Tuệ (B2)!');
             if (studentClassInput) studentClassInput.focus();
             return;
+        }
+
+        const isGiaTue = noToneName.includes('gia tue') || noToneName.replace(/\s+/g, '').includes('giatue');
+        if (finalClassVal === 'B2') {
+            if (!isGiaTue) {
+                showLoginError('Mã lớp B2 hiện chỉ dành riêng cho học viên Gia Tuệ (B2)!');
+                if (studentNameInput) studentNameInput.focus();
+                return;
+            }
+            finalStudentName = 'Gia Tuệ';
+        } else {
+            const roster = STUDENTS_BY_CLASS[finalClassVal] || [];
+            const normInp = normalizeNameB2(nameVal);
+            const matched = roster.find(st => {
+                const nSt = normalizeNameB2(st);
+                return nSt === normInp || removeVietnameseTonesB2(nSt) === noToneName;
+            });
+
+            if (matched) {
+                finalStudentName = matched;
+            } else if (finalClassVal === 'B212' && isGiaTue) {
+                finalStudentName = 'Gia Tuệ';
+                finalClassVal = 'B2';
+            } else {
+                showLoginError(`Họ và tên "${nameVal}" không có trong danh sách lớp ${finalClassVal}.`);
+                if (studentNameInput) studentNameInput.focus();
+                return;
+            }
         }
 
         if (!passwordVal) {
@@ -817,7 +902,8 @@ function handleLogin() {
             return;
         }
 
-        if (cleanAccessPassword(passwordVal) !== 'STUDYHARD') {
+        const cleanedPwd = cleanAccessPassword(passwordVal);
+        if (!['STUDYHARD', 'VSTEPWRITING', 'VSTEOWRITING', 'PRACTICEWRITING', 'PTMN'].includes(cleanedPwd)) {
             showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
             if (studentPasswordInput) {
                 studentPasswordInput.focus();
