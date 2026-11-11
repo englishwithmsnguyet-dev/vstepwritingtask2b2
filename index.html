@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHÒNG ÔN TẬP LUẬN B2 - ENGLISH WITH MISS NGUYET</title>
-    <link rel="stylesheet" href="style.css?v=4.4">
+    <link rel="stylesheet" href="style.css?v=4.5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
@@ -123,6 +123,20 @@
                         <div class="brand-badge-pill"><i class="fa-solid fa-certificate"></i> B2 LEVEL</div>
                     </div>
                 </a>
+            </div>
+
+            <!-- Student Profile Card in Sidebar -->
+            <div class="student-profile-card" id="studentProfileCard">
+                <div class="student-avatar" id="studentAvatarIcon">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div class="student-details">
+                    <div class="student-name-display" id="studentNameDisplay">Chưa đăng nhập</div>
+                    <div class="student-class-display"><span class="badge-class" id="studentClassDisplay">Lớp: --</span></div>
+                </div>
+                <button class="btn-edit-student" id="btnEditStudent" title="Đổi tài khoản" onclick="reopenLoginOverlay()">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
             </div>
             
             <!-- Sidebar Progress Tracking -->
@@ -334,6 +348,6 @@
     </div>
 
     <script src="data.js?v=4.3"></script>
-    <script src="app.js?v=4.3"></script>
+    <script src="app.js?v=4.5"></script>
 </body>
 </html>

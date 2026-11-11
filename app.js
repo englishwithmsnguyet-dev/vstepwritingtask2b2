@@ -780,6 +780,7 @@ function initLoginState() {
         loginOverlay.style.display = 'flex';
         appContainer.style.display = 'none';
     }
+    updateStudentProfileCard();
 
     if (btnLogin) {
         btnLogin.addEventListener('click', handleLogin);
@@ -950,6 +951,7 @@ function handleLogin() {
     localStorage.setItem('vstep_b2_student_class', finalClassVal);
     localStorage.setItem('vstep_b2_student_info', `${isTeacher ? 'PTMN' : nameVal} - Lớp ${finalClassVal}`);
     sessionStorage.setItem('vstep_b2_session_logged_in', 'true');
+    updateStudentProfileCard(isTeacher ? 'Cô Nguyệt (PTMN)' : nameVal, finalClassVal);
 
     // Unlock App
     setTimeout(() => {
@@ -961,6 +963,43 @@ function handleLogin() {
         }
     }, 300);
 }
+
+function updateStudentProfileCard(name, cls) {
+    const nameEl = document.getElementById('studentNameDisplay');
+    const classEl = document.getElementById('studentClassDisplay');
+    const avatarIcon = document.getElementById('studentAvatarIcon');
+    
+    if (!name) name = localStorage.getItem('vstep_b2_student_name') || '';
+    if (!cls) cls = localStorage.getItem('vstep_b2_student_class') || '';
+    
+    const isTeacher = (cls === 'GV' || name === 'PTMN' || (cls && cls.toUpperCase() === 'GV'));
+    
+    if (nameEl) {
+        nameEl.textContent = name || 'Chưa đăng nhập';
+        nameEl.title = name || '';
+    }
+    if (classEl) {
+        if (isTeacher) {
+            classEl.innerHTML = '<span class="badge-class" style="background: rgba(16,185,129,0.15); color: #059669;">Giáo viên (GV)</span>';
+        } else {
+            classEl.innerHTML = `<span class="badge-class">${cls ? 'Lớp: ' + cls : 'Lớp: --'}</span>`;
+        }
+    }
+    if (avatarIcon) {
+        avatarIcon.innerHTML = isTeacher ? '<i class="fa-solid fa-chalkboard-user"></i>' : '<i class="fa-solid fa-user-graduate"></i>';
+    }
+}
+
+window.reopenLoginOverlay = function() {
+    if (confirm('Bạn có muốn đăng xuất và đổi thông tin tài khoản không?')) {
+        sessionStorage.removeItem('vstep_b2_session_logged_in');
+        const loginOverlay = document.getElementById('loginOverlay');
+        const appContainer = document.getElementById('appContainer');
+        if (loginOverlay) loginOverlay.style.display = 'flex';
+        if (appContainer) appContainer.style.display = 'none';
+        updateStudentProfileCard('', '');
+    }
+};
 
 function showLoginError(msg) {
     const loginError = document.getElementById('loginError');
