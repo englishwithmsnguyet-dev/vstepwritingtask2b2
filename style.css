@@ -279,6 +279,16 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 14px;
     letter-spacing: 0.5px;
     animation: hashtagBlink 2s infinite ease-in-out;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sidebar-hashtag:hover {
+    transform: scale(1.05);
+    text-decoration: underline;
+    opacity: 1 !important;
 }
 
 [data-theme="dark"] .sidebar-hashtag {
@@ -547,27 +557,44 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Detailed Outline Special Styling */
+/* Detailed Outline Special Styling */
 #detailedOutlinePanel {
-    line-height: 1.8;
+    line-height: 1.85;
+    font-size: 16.5px;
+}
+
+#detailedOutlinePanel .outline-variant h3 {
+    font-size: 21px !important;
+    line-height: 1.4;
 }
 
 #detailedOutlinePanel p {
-    margin-bottom: 12px;
+    font-size: 16.5px !important;
+    line-height: 1.85 !important;
+    margin-bottom: 14px;
 }
 
 #detailedOutlinePanel li {
-    margin-bottom: 10px;
+    font-size: 16.5px !important;
+    line-height: 1.85 !important;
+    margin-bottom: 12px;
 }
 
 #detailedOutlinePanel ul {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
+}
+
+#detailedOutlinePanel code {
+    font-size: 15.5px !important;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .outline-step {
     background-color: var(--bg-main);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
+    border-radius: 14px;
+    padding: 24px 22px;
+    margin-bottom: 20px;
     border: 1px solid var(--border-color);
     position: relative;
     overflow: hidden;
@@ -590,29 +617,50 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .outline-step h4 {
-    font-size: 18px;
-    margin-bottom: 8px;
+    font-size: 19px;
+    margin-bottom: 12px;
     color: var(--accent-red);
 }
 
 .outline-structures h5,
 .outline-substep h5 {
     color: var(--accent-red);
-    margin-bottom: 8px;
-    font-size: 16px;
+    margin-bottom: 10px;
+    font-size: 17px;
 }
 
 .outline-phrase {
     background-color: var(--bg-card);
     display: inline;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 6px;
-    font-family: monospace;
-    font-size: 14px;
+    font-family: inherit;
+    font-size: 16.5px;
+    line-height: 1.85;
+    font-weight: 500;
     color: var(--primary-hover);
-    border: 1px dashed var(--border-color);
+    border: 1.5px dashed var(--border-color);
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
+}
+
+[data-theme="dark"] .outline-phrase {
+    color: #a5b4fc;
+    background-color: rgba(99, 102, 241, 0.12);
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+/* Suggestion & Guidance Boxes in Outline */
+#detailedOutlinePanel div[style*="border-left"] h5 {
+    font-size: 17px !important;
+    margin-bottom: 10px !important;
+}
+
+#detailedOutlinePanel div[style*="border-left"] p,
+#detailedOutlinePanel div[style*="border-left"] li,
+#detailedOutlinePanel div[style*="border-left"] span {
+    font-size: 16px !important;
+    line-height: 1.8 !important;
 }
 
 /* Practice Area */
@@ -1445,43 +1493,9 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-/* Owner Info Link */
+/* Owner Info Link - Removed */
 .owner-info-link {
-    position: absolute;
-    bottom: 20px;
-    right: 24px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-decoration: none;
-    background: var(--glass-bg);
-    border: 1px solid var(--border-color);
-    padding: 8px 14px;
-    border-radius: 20px;
-    box-shadow: var(--shadow-sm);
-    z-index: 100;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    letter-spacing: 0.5px;
-}
-
-.owner-info-link::before {
-    content: '\f09a';
-    font-family: 'Font Awesome 6 Brands';
-    font-weight: 400;
-    color: #1877f2; /* Facebook Blue */
-    font-size: 12px;
-}
-
-.owner-info-link:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    color: var(--primary-color);
-    border-color: var(--primary-color);
+    display: none !important;
 }
 
 /* Sample Essay Frame */
