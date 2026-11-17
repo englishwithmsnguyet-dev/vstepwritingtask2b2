@@ -537,6 +537,90 @@ function renderNav() {
 }
 
 
+/**
+ * Sets up interactive sub-tabs for panels that contain multiple variants (e.g. Dàn ý 1, Dàn ý 2)
+ * so users can switch between them instead of scrolling vertically.
+ */
+function setupVariantTabs(container, itemSelector = '.outline-variant', defaultPrefix = 'DÀN Ý') {
+    if (!container) return;
+
+    const variants = container.querySelectorAll(itemSelector);
+    if (!variants || variants.length <= 1) {
+        const oldNav = container.querySelector('.outline-variant-tabs-nav');
+        if (oldNav) oldNav.remove();
+        if (variants && variants.length === 1) {
+            variants[0].style.display = 'block';
+            variants[0].style.marginTop = '0';
+        }
+        return;
+    }
+
+    // Remove any existing variant navigation
+    const oldNav = container.querySelector('.outline-variant-tabs-nav');
+    if (oldNav) oldNav.remove();
+
+    // Create tabs navigation
+    const nav = document.createElement('div');
+    nav.className = 'outline-variant-tabs-nav';
+
+    variants.forEach((variant, index) => {
+        const h3 = variant.querySelector('h3');
+        const fullTitle = h3 ? h3.textContent.trim() : `${defaultPrefix} ${index + 1}`;
+
+        let badgeText = `${defaultPrefix} 0${index + 1}`;
+        let titleText = fullTitle;
+        if (fullTitle.includes(':')) {
+            const parts = fullTitle.split(':');
+            badgeText = parts[0].trim();
+            titleText = parts.slice(1).join(':').trim();
+        } else if (fullTitle.includes('-')) {
+            const parts = fullTitle.split('-');
+            badgeText = parts[0].trim();
+            titleText = parts.slice(1).join('-').trim();
+        }
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `outline-variant-tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.innerHTML = `
+            <span class="variant-tab-badge"><i class="fa-solid fa-layer-group"></i> ${badgeText}</span>
+            <span class="variant-tab-title">${titleText}</span>
+        `;
+
+        btn.addEventListener('click', () => {
+            nav.querySelectorAll('.outline-variant-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            variants.forEach((v, vIdx) => {
+                if (vIdx === index) {
+                    v.style.display = 'block';
+                    v.style.marginTop = '0';
+                    v.classList.remove('fade-slide-in');
+                    void v.offsetWidth;
+                    v.classList.add('fade-slide-in');
+                } else {
+                    v.style.display = 'none';
+                }
+            });
+
+            nav.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        nav.appendChild(btn);
+
+        // Initial display state
+        if (index === 0) {
+            variant.style.display = 'block';
+            variant.style.marginTop = '0';
+        } else {
+            variant.style.display = 'none';
+            variant.style.marginTop = '0';
+        }
+    });
+
+    container.insertBefore(nav, container.firstChild);
+}
+
 // Select an Essay Type
 function selectEssayType(id) {
     activeEssayTypeId = id;
@@ -572,6 +656,7 @@ function selectEssayType(id) {
     if (identifyingSignsPanel) identifyingSignsPanel.innerHTML = typeData.identifyingSigns;
     if (detailedOutlinePanel) {
         detailedOutlinePanel.innerHTML = typeData.detailedOutline.replace(/\[([^\]]+)\]/g, '[<strong>$1</strong>]');
+        setupVariantTabs(detailedOutlinePanel, '.outline-variant', 'DÀN Ý');
     }
     if (sampleWritingPanel) sampleWritingPanel.innerHTML = typeData.sampleWriting;
 

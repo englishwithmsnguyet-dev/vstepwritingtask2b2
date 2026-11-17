@@ -557,10 +557,128 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Detailed Outline Special Styling */
-/* Detailed Outline Special Styling */
 #detailedOutlinePanel {
     line-height: 1.85;
     font-size: 16.5px;
+}
+
+/* Outline Variant Sub-Tabs Navigation */
+.outline-variant-tabs-nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 26px;
+    padding: 8px;
+    background-color: var(--bg-main);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+}
+
+.outline-variant-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background-color: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    text-align: left;
+    transition: all 0.25s ease;
+    user-select: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.outline-variant-tab-btn:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.outline-variant-tab-btn.active {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(139, 92, 246, 0.12));
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18);
+}
+
+.variant-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.variant-tab-badge i {
+    font-size: 11px;
+}
+
+.outline-variant-tab-btn.active .variant-tab-badge {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+}
+
+.variant-tab-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: color 0.25s ease;
+    line-height: 1.35;
+}
+
+.outline-variant-tab-btn.active .variant-tab-title {
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.fade-slide-in {
+    animation: variantFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes variantFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+[data-theme="dark"] .outline-variant-tabs-nav {
+    background-color: rgba(15, 23, 42, 0.6);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .outline-variant-tab-btn.active {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(167, 139, 250, 0.18));
+    border-color: var(--primary-color);
+}
+
+@media (max-width: 640px) {
+    .outline-variant-tabs-nav {
+        grid-template-columns: 1fr;
+        padding: 6px;
+        gap: 8px;
+    }
+    .outline-variant-tab-btn {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
 }
 
 #detailedOutlinePanel .outline-variant h3 {
