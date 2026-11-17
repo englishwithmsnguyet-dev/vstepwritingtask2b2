@@ -655,7 +655,7 @@ function selectEssayType(id) {
     if (basicInfoPanel) basicInfoPanel.innerHTML = typeData.basicInfo;
     if (identifyingSignsPanel) identifyingSignsPanel.innerHTML = typeData.identifyingSigns;
     if (detailedOutlinePanel) {
-        detailedOutlinePanel.innerHTML = typeData.detailedOutline.replace(/\[([^\]]+)\]/g, '[<strong>$1</strong>]');
+        detailedOutlinePanel.innerHTML = typeData.detailedOutline.replace(/\[([^\]]+)\]/g, '<span class="outline-tag">[$1]</span>');
         setupVariantTabs(detailedOutlinePanel, '.outline-variant', 'DÀN Ý');
     }
     if (sampleWritingPanel) sampleWritingPanel.innerHTML = typeData.sampleWriting;
