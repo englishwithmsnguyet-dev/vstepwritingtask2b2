@@ -656,15 +656,24 @@ function setupVariantTabs(container, itemSelector = '.outline-variant', defaultP
             titleText = parts.slice(1).join('-').trim();
         }
 
+        const lowerWords = ['và', 'với', 'cho', 'của', 'trong', 'để', 'về'];
+        const formattedTitle = titleText.trim().toLowerCase().split(/\s+/).map((w, i) => {
+            if (i > 0 && lowerWords.includes(w)) return w;
+            return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+
         const isLocked = isOutlineLocked(activeEssayTypeId, index);
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `outline-variant-tab-btn ${index === 0 ? 'active' : ''} ${isLocked ? 'is-locked' : ''}`;
         btn.innerHTML = `
-            <span class="variant-tab-badge ${isLocked ? 'is-locked' : ''}">
-                <i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-layer-group'}"></i> ${badgeText}
-            </span>
-            <span class="variant-tab-title">${titleText} ${isLocked ? '<span class="tab-lock-badge"><i class="fa-solid fa-lock"></i> Khoá</span>' : ''}</span>
+            <div class="variant-tab-header">
+                <span class="variant-tab-badge ${isLocked ? 'is-locked' : ''}">
+                    <i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-layer-group'}"></i> ${badgeText}
+                </span>
+                ${isLocked ? '<span class="tab-lock-badge"><i class="fa-solid fa-lock"></i> Khoá</span>' : ''}
+            </div>
+            <div class="variant-tab-title">${formattedTitle}</div>
         `;
 
         btn.addEventListener('click', () => {
