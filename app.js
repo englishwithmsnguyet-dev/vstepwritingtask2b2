@@ -638,7 +638,7 @@ function setupVariantTabs(container, itemSelector = '.outline-variant', defaultP
 
     // Create tabs navigation
     const nav = document.createElement('div');
-    nav.className = 'outline-variant-tabs-nav';
+    nav.className = `outline-variant-tabs-nav ${variants.length === 2 ? 'nav-cols-2' : 'nav-cols-3'}`;
 
     variants.forEach((variant, index) => {
         const h3 = variant.querySelector('h3');
