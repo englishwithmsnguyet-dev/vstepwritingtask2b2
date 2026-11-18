@@ -118,8 +118,11 @@ function markEssayCompleted(id) {
 
 function updateGlobalProgress() {
     const completed = getCompletedEssays();
-    const total = 4;
-    const count = completed.length;
+    const userClass = getUserClass();
+    const isRestricted = ['CB211', 'CB213', 'ONB103'].includes(userClass);
+    const total = isRestricted ? 2 : 4;
+    const validCompleted = isRestricted ? completed.filter(id => id === 'adv-disadv' || id === 'cause-effect') : completed;
+    const count = validCompleted.length;
     const percent = Math.round((count / total) * 100);
 
     // Update Sidebar progress
@@ -140,7 +143,9 @@ function updateGlobalProgress() {
         if (count === 0) {
             dashStatus.textContent = "Chưa hoàn thành dạng bài nào. Hãy bắt đầu học tập!";
         } else if (count === total) {
-            dashStatus.textContent = "🎉 TUYỆT VỜI! Bạn đã xuất sắc chinh phục tất cả 4 dạng luận VSTEP Writing Task 02!";
+            dashStatus.textContent = isRestricted
+                ? "🎉 TUYỆT VỜI! Bạn đã xuất sắc hoàn thành các dạng bài được mở cho lớp của mình!"
+                : "🎉 TUYỆT VỜI! Bạn đã xuất sắc chinh phục tất cả 4 dạng luận VSTEP Writing Task 02!";
         } else {
             dashStatus.textContent = `Đã chinh phục ${count}/${total} dạng bài. Hãy tiếp tục nhiệm vụ tiếp theo!`;
         }
@@ -497,6 +502,79 @@ function showWelcomeScreen() {
     }
 }
 
+// User Class & Permission Helpers
+function isTeacherUser() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('vstep_student_info'));
+        if (saved) {
+            const cls = (saved.className || '').toUpperCase();
+            const name = (saved.fullName || '').toUpperCase();
+            if (cls === 'GV' || name === 'PTMN') return true;
+        }
+    } catch (e) {}
+    const curCls = (sessionStorage.getItem('current_user_class') || '').toUpperCase();
+    return curCls === 'GV';
+}
+
+function getUserClass() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('vstep_student_info'));
+        if (saved && saved.className) return saved.className.toUpperCase();
+    } catch (e) {}
+    return (sessionStorage.getItem('current_user_class') || '').toUpperCase();
+}
+
+function isTypeLocked(typeId) {
+    if (isTeacherUser()) return false;
+    const userClass = getUserClass();
+    if (['CB211', 'CB213', 'ONB103'].includes(userClass)) {
+        return (typeId === 'opinion' || typeId === 'discussion');
+    }
+    return false;
+}
+
+function isOutlineLocked(typeId, outlineIndex) {
+    if (isTeacherUser()) return false;
+    const userClass = getUserClass();
+    if (['CB211', 'CB213', 'ONB103'].includes(userClass)) {
+        if (typeId === 'cause-effect') {
+            return outlineIndex >= 2; // Only first 2 outlines (index 0 and 1) are unlocked
+        }
+        if (typeId === 'opinion' || typeId === 'discussion') {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Toast Notification
+let toastNoticeTimeout = null;
+function showToast(message, type = 'warning') {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `app-toast toast-${type}`;
+    let icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+    if (type === 'success') icon = '<i class="fa-solid fa-circle-check"></i>';
+    if (type === 'danger' || type === 'lock') icon = '<i class="fa-solid fa-lock"></i>';
+    
+    toast.innerHTML = `${icon}<span>${message}</span>`;
+    
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+
 // Render Navigation
 function renderNav() {
     if (!essayNav) return;
@@ -519,19 +597,35 @@ function renderNav() {
 
     essayTypes.forEach(type => {
         const isCompleted = completed.includes(type.id);
+        const locked = isTypeLocked(type.id);
         const navItem = document.createElement('div');
-        navItem.className = 'nav-item';
+        navItem.className = 'nav-item' + (locked ? ' is-locked' : '');
         navItem.dataset.id = type.id;
+
+        let statusBadge = '';
+        if (locked) {
+            statusBadge = '<span class="nav-lock-badge" title="Dạng luận này tạm thời chưa mở cho lớp của bạn"><i class="fa-solid fa-lock"></i> Khoá</span>';
+        } else if (isCompleted) {
+            statusBadge = '<span class="nav-completed-badge" title="Đã chinh phục"><i class="fa-solid fa-circle-check"></i></span>';
+        }
+
         navItem.innerHTML = `
-            <i class="fa-solid ${type.icon}"></i>
+            <i class="fa-solid ${locked ? 'fa-lock' : type.icon}"></i>
             <div class="nav-text">
                 <div class="nav-title-en">${type.titleEn}</div>
                 <div class="nav-title-vi">${type.titleVi}</div>
             </div>
-            ${isCompleted ? '<span class="nav-completed-badge" title="Đã chinh phục"><i class="fa-solid fa-circle-check"></i></span>' : ''}
+            ${statusBadge}
         `;
         
-        navItem.addEventListener('click', () => selectEssayType(type.id));
+        navItem.addEventListener('click', () => {
+            if (isTypeLocked(type.id)) {
+                const userClass = getUserClass();
+                showToast(`🔒 Dạng luận này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dạng 01 và 2 dàn ý đầu của Dạng 02!`, 'warning');
+                return;
+            }
+            selectEssayType(type.id);
+        });
         essayNav.appendChild(navItem);
     });
 }
@@ -579,15 +673,23 @@ function setupVariantTabs(container, itemSelector = '.outline-variant', defaultP
             titleText = parts.slice(1).join('-').trim();
         }
 
+        const isLocked = isOutlineLocked(activeEssayTypeId, index);
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `outline-variant-tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.className = `outline-variant-tab-btn ${index === 0 ? 'active' : ''} ${isLocked ? 'is-locked' : ''}`;
         btn.innerHTML = `
-            <span class="variant-tab-badge"><i class="fa-solid fa-layer-group"></i> ${badgeText}</span>
-            <span class="variant-tab-title">${titleText}</span>
+            <span class="variant-tab-badge ${isLocked ? 'is-locked' : ''}">
+                <i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-layer-group'}"></i> ${badgeText}
+            </span>
+            <span class="variant-tab-title">${titleText} ${isLocked ? '<span class="tab-lock-badge"><i class="fa-solid fa-lock"></i> Khoá</span>' : ''}</span>
         `;
 
         btn.addEventListener('click', () => {
+            if (isOutlineLocked(activeEssayTypeId, index)) {
+                const userClass = getUserClass();
+                showToast(`🔒 Dàn ý này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dàn ý 01 và 2 dàn ý đầu của Dạng 02!`, 'warning');
+                return;
+            }
             nav.querySelectorAll('.outline-variant-tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
@@ -623,6 +725,11 @@ function setupVariantTabs(container, itemSelector = '.outline-variant', defaultP
 
 // Select an Essay Type
 function selectEssayType(id) {
+    if (isTypeLocked(id)) {
+        const userClass = getUserClass();
+        showToast(`🔒 Dạng luận này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dạng 01 và 2 dàn ý đầu của Dạng 02!`, 'warning');
+        return;
+    }
     activeEssayTypeId = id;
     
     // Update active nav
