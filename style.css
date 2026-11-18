@@ -33,8 +33,8 @@
     --glass-bg: rgba(255, 255, 255, 0.85);
     --glass-border: rgba(255, 255, 255, 0.6);
 
-    --font-heading: 'Plus Jakarta Sans', 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-body: 'Plus Jakarta Sans', 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Roboto Serif', 'Merriweather', 'Lora', Georgia, serif;
+    --font-body: 'Roboto Serif', 'Merriweather', 'Lora', Georgia, serif;
     --font-serif: 'Roboto Serif', 'Merriweather', 'Lora', Georgia, serif;
 }
 
@@ -3169,4 +3169,50 @@ h1, h2, h3, h4, h5, h6 {
 
 [data-theme="dark"] .outline-tab-btn.active .outline-tab-btn-count {
     color: #93c5fd !important;
+}
+
+/* ==========================================================================
+   GLOBAL SERIF TYPOGRAPHY (ROBOTO SERIF & MERRIWEATHER SITE-WIDE)
+   Applied 100% across all pages, components, sidebars, modals and buttons
+   ========================================================================== */
+html,
+body,
+button,
+input,
+select,
+textarea,
+h1, h2, h3, h4, h5, h6,
+p, span:not(i):not([class*="fa-"]),
+a, li, label, strong, em, b,
+.nav-item,
+.tab-btn,
+.outline-variant-tab-btn,
+.outline-tab-btn,
+.variant-tab-title,
+.outline-tab-btn-name,
+.variant-tab-badge,
+.outline-tab-btn-tag,
+.brand-name,
+.brand-desc,
+.credit,
+.modal-card,
+.login-card-custom,
+.prompt-box,
+.sample-letter-box,
+.outline-step,
+.quiz-box,
+.app-toast,
+.recitation-box,
+.comparison-box-item,
+.box-label,
+.formula-stage,
+.content-block {
+    font-family: 'Roboto Serif', 'Merriweather', 'Lora', Georgia, Cambria, 'Times New Roman', serif !important;
+}
+
+/* Explicitly protect Font Awesome icons from font-family override */
+i, [class*="fa-"], .fa-solid, .fa-regular, .fa-brands {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome" !important;
+    font-style: normal !important;
+    display: inline-block !important;
 }
