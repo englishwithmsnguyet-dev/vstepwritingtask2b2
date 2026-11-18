@@ -165,20 +165,233 @@ function resetLearningProgress() {
     }
 }
 
-// Save current recitation progress
-function saveCurrentRecitationProgress() {
-    // Luôn mặc định trả từ câu đầu của Mở bài khi mở mục Trả Bài
+// Recitation Timer Variables & Functions
+let recitationTimerBadge;
+let recitationCountdown;
+let timeSpentVal;
+let recitationTimerInterval = null;
+const RECITATION_TIME_LIMIT = 20 * 60; // 20 minutes = 1200 seconds
+let recitationTimeRemaining = RECITATION_TIME_LIMIT;
+let isRecitationTimerRunning = false;
+
+function formatTimerString(totalSeconds) {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    const pad = (n) => (n < 10 ? '0' + n : n);
+    return `${pad(mins)}:${pad(secs)}`;
 }
 
-// Reset Recitation State and UI - Luôn mặc định trả từ câu đầu của Mở bài
-function resetRecitationUI(isRestart = false) {
-    if (activeEssayTypeId) {
-        try { localStorage.removeItem('vstep_b2_recitation_' + activeEssayTypeId); } catch (e) {}
+function updateRecitationTimerDisplay() {
+    if (recitationCountdown) {
+        recitationCountdown.textContent = formatTimerString(recitationTimeRemaining);
     }
 
+    if (recitationTimerBadge) {
+        recitationTimerBadge.classList.remove('timer-normal', 'timer-warning', 'timer-urgent');
+        if (recitationTimeRemaining > 300) {
+            recitationTimerBadge.classList.add('timer-normal');
+        } else if (recitationTimeRemaining > 60) {
+            recitationTimerBadge.classList.add('timer-warning');
+        } else {
+            recitationTimerBadge.classList.add('timer-urgent');
+        }
+    }
+}
+
+function startRecitationTimer() {
+    if (isRecitationTimerRunning) return;
+    if (recitationTimeRemaining <= 0) {
+        recitationTimeRemaining = RECITATION_TIME_LIMIT;
+    }
+    isRecitationTimerRunning = true;
+    updateRecitationTimerDisplay();
+
+    if (recitationTimerInterval) clearInterval(recitationTimerInterval);
+    recitationTimerInterval = setInterval(() => {
+        if (recitationTimeRemaining > 0) {
+            recitationTimeRemaining--;
+            updateRecitationTimerDisplay();
+            if (recitationTimeRemaining % 3 === 0) {
+                saveCurrentRecitationProgress();
+            }
+        } else {
+            handleRecitationTimeUp();
+        }
+    }, 1000);
+}
+
+function stopRecitationTimer() {
+    if (recitationTimerInterval) {
+        clearInterval(recitationTimerInterval);
+        recitationTimerInterval = null;
+    }
+    isRecitationTimerRunning = false;
+}
+
+function resetRecitationTimer() {
+    stopRecitationTimer();
+    recitationTimeRemaining = RECITATION_TIME_LIMIT;
+    updateRecitationTimerDisplay();
+}
+
+function handleRecitationTimeUp() {
+    stopRecitationTimer();
+    if (recitationInput) recitationInput.disabled = true;
+    const userAns = recitationInput ? recitationInput.value.trim() : '';
+    if (userAns && (!recitationFeedback || recitationFeedback.classList.contains('hidden'))) {
+        const q = activeQuestions[currentQuestionIndex];
+        if (q) {
+            const diffResult = diffWords(userAns, q.target);
+            questionScores[currentQuestionIndex] = diffResult.accuracy;
+        }
+    }
+    alert('⏰ ĐÃ HẾT THỜI GIAN 20 PHÚT LÀM BÀI!\nHệ thống tự động nộp bài và hiển thị kết quả đánh giá trả bài của bạn.');
+    showEvaluationResult();
+}
+
+// --- Anti-Cheat & Auto-Save State ---
+let violationCount = 0;
+let isAntiCheatModalOpen = false;
+let isTabHidden = false;
+
+function isRecitationSessionActive() {
+    const practicePanel = document.getElementById('writingPracticePanel');
+    const isPracticeActive = practicePanel && practicePanel.classList.contains('active');
+    const isQuizVisible = recitationQuizBox && !recitationQuizBox.classList.contains('hidden');
+    const isResultHidden = recitationResultBox && recitationResultBox.classList.contains('hidden');
+    return Boolean(activeEssayTypeId && isPracticeActive && isQuizVisible && isResultHidden);
+}
+
+function getRecitationStorageKey() {
+    if (!activeEssayTypeId) return null;
+    return `vstep_b2_recitation_save_${activeEssayTypeId}`;
+}
+
+// Save current recitation progress
+function saveCurrentRecitationProgress() {
+    if (!isRecitationSessionActive()) return;
+    const key = getRecitationStorageKey();
+    if (!key) return;
+
+    const data = {
+        essayTypeId: activeEssayTypeId,
+        questionIndex: currentQuestionIndex,
+        questionScores: questionScores,
+        timeRemaining: recitationTimeRemaining,
+        violationCount: violationCount,
+        userDraft: recitationInput ? recitationInput.value : '',
+        timestamp: Date.now()
+    };
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+        console.error('Failed to auto-save progress', e);
+    }
+}
+
+function loadSavedRecitationProgress() {
+    const key = getRecitationStorageKey();
+    if (!key) return null;
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (Date.now() - data.timestamp > 24 * 60 * 60 * 1000) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        return data;
+    } catch (e) {
+        return null;
+    }
+}
+
+function clearSavedRecitationProgress() {
+    const key = getRecitationStorageKey();
+    if (key) {
+        try { localStorage.removeItem(key); } catch (e) {}
+    }
+}
+
+function recordAntiCheatViolation(reason) {
+    if (isAntiCheatModalOpen) return;
+    violationCount++;
+    saveCurrentRecitationProgress();
+    showAntiCheatModal(reason);
+}
+
+function showAntiCheatModal(reason) {
+    isAntiCheatModalOpen = true;
+    const modal = document.getElementById('antiCheatModal');
+    const countEl = document.getElementById('modalViolationCount');
+    const reasonEl = document.getElementById('modalViolationReason');
+    if (countEl) countEl.textContent = violationCount;
+    if (reasonEl) reasonEl.textContent = reason || 'Hệ thống phát hiện hành vi rời khỏi bài thi hoặc chuyển tab tra cứu!';
+    if (modal) modal.classList.remove('hidden');
+}
+
+function dismissAntiCheatModal() {
+    const modal = document.getElementById('antiCheatModal');
+    if (modal) modal.classList.add('hidden');
+    isAntiCheatModalOpen = false;
+    if (recitationInput && !recitationInput.disabled) {
+        recitationInput.focus();
+    }
+}
+
+function getStudentDisplayInfo() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('vstep_student_info') || '{}');
+        if (saved && saved.fullName) {
+            if (saved.className && saved.className.trim()) {
+                return `${saved.fullName} (${saved.className})`;
+            }
+            return saved.fullName;
+        }
+    } catch (e) {}
+    const b2Name = localStorage.getItem('vstep_b2_student_name');
+    const b2Cls = localStorage.getItem('vstep_b2_student_class');
+    if (b2Name) {
+        return b2Cls ? `${b2Name} (${b2Cls})` : b2Name;
+    }
+    const sessionClass = sessionStorage.getItem('current_user_class');
+    if (sessionClass) {
+        return `Học viên (${sessionClass})`;
+    }
+    return 'Học viên VSTEP B2';
+}
+
+// Reset Recitation State and UI - Supports Auto-Save restoration and fresh restart
+function resetRecitationUI(isRestart = false) {
     activeQuestions = recitationQuestions[activeEssayTypeId] || [];
-    currentQuestionIndex = 0;
-    questionScores = Array(activeQuestions.length).fill(0);
+    let restoredDraft = '';
+
+    if (isRestart) {
+        clearSavedRecitationProgress();
+        violationCount = 0;
+        currentQuestionIndex = 0;
+        questionScores = Array(activeQuestions.length).fill(0);
+        recitationTimeRemaining = RECITATION_TIME_LIMIT;
+    } else {
+        const saved = loadSavedRecitationProgress();
+        if (saved && typeof saved.questionIndex === 'number' && saved.questionIndex < activeQuestions.length) {
+            currentQuestionIndex = saved.questionIndex;
+            questionScores = (Array.isArray(saved.questionScores) && saved.questionScores.length === activeQuestions.length)
+                ? saved.questionScores
+                : Array(activeQuestions.length).fill(0);
+            recitationTimeRemaining = (typeof saved.timeRemaining === 'number' && saved.timeRemaining > 0)
+                ? saved.timeRemaining
+                : RECITATION_TIME_LIMIT;
+            violationCount = typeof saved.violationCount === 'number' ? saved.violationCount : 0;
+            restoredDraft = saved.userDraft || '';
+        } else {
+            clearSavedRecitationProgress();
+            violationCount = 0;
+            currentQuestionIndex = 0;
+            questionScores = Array(activeQuestions.length).fill(0);
+            recitationTimeRemaining = RECITATION_TIME_LIMIT;
+        }
+    }
     
     if (recitationInput) recitationInput.value = '';
     if (recitationFeedback) recitationFeedback.classList.add('hidden');
@@ -201,7 +414,16 @@ function resetRecitationUI(isRestart = false) {
     const progressWrapper = document.querySelector('.recitation-progress-wrapper');
     if (progressWrapper) progressWrapper.style.display = '';
     
+    // Countdown timer
+    stopRecitationTimer();
+    updateRecitationTimerDisplay();
+    startRecitationTimer();
+
     showRecitationQuestion();
+
+    if (restoredDraft && recitationInput) {
+        recitationInput.value = restoredDraft;
+    }
 }
 
 // Show the current question
@@ -391,6 +613,13 @@ function nextRecitationQuestion() {
 
 // Show evaluation result screen
 function showEvaluationResult() {
+    // Stop the timer
+    stopRecitationTimer();
+    const timeSpentSeconds = Math.max(0, RECITATION_TIME_LIMIT - recitationTimeRemaining);
+    if (timeSpentVal) {
+        timeSpentVal.textContent = formatTimerString(timeSpentSeconds);
+    }
+
     // Hide quiz box and feedback panel
     if (recitationQuizBox) recitationQuizBox.classList.add('hidden');
     if (recitationFeedback) recitationFeedback.classList.add('hidden');
@@ -448,6 +677,24 @@ function showEvaluationResult() {
             evalCard.classList.add('failed');
         }
     }
+
+    // Populate student name in evaluation meta box
+    const evalStudentName = document.getElementById('evalStudentName');
+    if (evalStudentName) {
+        evalStudentName.textContent = getStudentDisplayInfo();
+    }
+
+    // Populate anti-cheat violation count
+    const violationValEl = document.getElementById('violationCountVal');
+    if (violationValEl) {
+        if (violationCount === 0) {
+            violationValEl.innerHTML = `<span class="badge-violation badge-violation-clean"><i class="fa-solid fa-shield-check"></i> 0 lần (Trung thực)</span>`;
+        } else {
+            violationValEl.innerHTML = `<span class="badge-violation badge-violation-warning"><i class="fa-solid fa-triangle-exclamation"></i> ${violationCount} lần (Cảnh báo gian lận)</span>`;
+        }
+    }
+
+    clearSavedRecitationProgress();
     
     // Show result box
     if (recitationResultBox) recitationResultBox.classList.remove('hidden');
@@ -573,7 +820,15 @@ function renderNav() {
             <div class="nav-title-vi">Màn hình khởi đầu</div>
         </div>
     `;
-    homeItem.addEventListener('click', showWelcomeScreen);
+    homeItem.addEventListener('click', (e) => {
+        if (isRecitationSessionActive()) {
+            e.preventDefault();
+            e.stopPropagation();
+            recordAntiCheatViolation('Rời khỏi bài thi để về trang chủ');
+            return;
+        }
+        showWelcomeScreen();
+    });
     essayNav.appendChild(homeItem);
 
     const completed = getCompletedEssays();
@@ -601,7 +856,13 @@ function renderNav() {
             ${statusBadge}
         `;
         
-        navItem.addEventListener('click', () => {
+        navItem.addEventListener('click', (e) => {
+            if (isRecitationSessionActive()) {
+                e.preventDefault();
+                e.stopPropagation();
+                recordAntiCheatViolation('Rời khỏi bài thi để chuyển sang dạng bài khác');
+                return;
+            }
             if (isTypeLocked(type.id)) {
                 const userClass = getUserClass();
                 showToast(`🔒 Dạng luận này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dạng 01 và 2 dàn ý đầu của Dạng 02!`, 'warning');
@@ -799,6 +1060,9 @@ document.addEventListener('DOMContentLoaded', () => {
     resultMessageVal = document.getElementById('resultMessageVal');
     btnRestartRecitation = document.getElementById('btnRestartRecitation');
     evaluationIcon = document.getElementById('evaluationIcon');
+    recitationTimerBadge = document.getElementById('recitationTimerBadge');
+    recitationCountdown = document.getElementById('recitationCountdown');
+    timeSpentVal = document.getElementById('timeSpentVal');
 
     // Render navigation
     renderNav();
@@ -813,6 +1077,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+            const tabId = e.currentTarget.dataset.tab;
+
+            // Anti-cheat: Block switching away from writingPractice while active
+            if (isRecitationSessionActive() && tabId !== 'writingPractice') {
+                e.preventDefault();
+                e.stopPropagation();
+                recordAntiCheatViolation('Chuyển sang tab nội dung khác (Dàn ý, Bài mẫu,...) để tra cứu trong khi đang làm bài');
+                return;
+            }
+
             // Remove active class from all buttons and panels
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -821,12 +1095,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.currentTarget.classList.add('active');
 
             // Show corresponding panel
-            const tabId = e.currentTarget.dataset.tab;
             const panel = document.getElementById(`${tabId}Panel`);
             if (panel) panel.classList.add('active');
 
             if (tabId === 'writingPractice') {
-                resetRecitationUI(true);
+                resetRecitationUI(false);
             }
         });
     });
@@ -837,6 +1110,52 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnCheckAnswer) btnCheckAnswer.addEventListener('click', checkRecitationAnswer);
     if (btnNextQuestion) btnNextQuestion.addEventListener('click', nextRecitationQuestion);
     if (btnRestartRecitation) btnRestartRecitation.addEventListener('click', () => resetRecitationUI(true));
+
+    if (recitationInput) {
+        recitationInput.addEventListener('input', () => {
+            saveCurrentRecitationProgress();
+        });
+    }
+
+    // Anti-cheat window / tab switching detection
+    document.addEventListener('visibilitychange', () => {
+        if (!isRecitationSessionActive()) return;
+        if (document.hidden) {
+            isTabHidden = true;
+        } else if (isTabHidden) {
+            isTabHidden = false;
+            recordAntiCheatViolation('Rời khỏi tab trình duyệt hoặc chuyển sang cửa sổ ứng dụng khác');
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        if (!isRecitationSessionActive() || isAntiCheatModalOpen) return;
+        setTimeout(() => {
+            if (!document.hasFocus() && isRecitationSessionActive() && !isAntiCheatModalOpen) {
+                isTabHidden = true;
+            }
+        }, 300);
+    });
+
+    window.addEventListener('focus', () => {
+        if (!isRecitationSessionActive() || isAntiCheatModalOpen) return;
+        if (isTabHidden) {
+            isTabHidden = false;
+            recordAntiCheatViolation('Rời khỏi tab trình duyệt hoặc chuyển sang cửa sổ ứng dụng khác');
+        }
+    });
+
+    // Anti-cheat modal dismiss button
+    const btnDismissAntiCheat = document.getElementById('btnDismissAntiCheat');
+    if (btnDismissAntiCheat) {
+        btnDismissAntiCheat.addEventListener('click', dismissAntiCheatModal);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (isAntiCheatModalOpen && (e.key === 'Escape' || e.key === 'Enter')) {
+            dismissAntiCheatModal();
+        }
+    });
 
     // Theme Toggle
     if (themeToggle) {
