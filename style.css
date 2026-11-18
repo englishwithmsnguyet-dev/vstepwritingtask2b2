@@ -2132,6 +2132,14 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
 }
 
+/* Anti-Copy Protection on Cues */
+.recitation-container .question-cue-box {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .evaluation-message {
     font-size: 16px;
     color: var(--text-main);

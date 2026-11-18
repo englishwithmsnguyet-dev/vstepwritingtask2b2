@@ -1202,6 +1202,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Anti-Copy & Anti-Paste Protection in Recitation ---
+    if (recitationInput) {
+        recitationInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            recordAntiCheatViolation('Cố tình dán (Paste) nội dung vào ô trả lời thay vì tự gõ thuộc lòng');
+        });
+
+        recitationInput.addEventListener('drop', (e) => {
+            e.preventDefault();
+            recordAntiCheatViolation('Cố tình kéo thả (Drag & Drop) văn bản vào ô trả lời');
+        });
+
+        recitationInput.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'v')) {
+                e.preventDefault();
+                recordAntiCheatViolation('Cố tình dùng phím tắt dán (Ctrl+V / Cmd+V) vào bài thi');
+            }
+        });
+
+        recitationInput.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showToast('⚠️ Chuột phải đã bị vô hiệu hóa trong bài thi!', 'warning');
+        });
+    }
+
+    // Block Copy / Cut during active recitation
+    document.addEventListener('copy', (e) => {
+        if (isRecitationSessionActive()) {
+            e.preventDefault();
+            showToast('⚠️ Tính năng sao chép (Copy) đã bị khóa trong bài thi!', 'warning');
+        }
+    });
+
+    document.addEventListener('cut', (e) => {
+        if (isRecitationSessionActive()) {
+            e.preventDefault();
+            showToast('⚠️ Tính năng cắt (Cut) đã bị khóa trong bài thi!', 'warning');
+        }
+    });
+
+    const recitationContainer = document.querySelector('.recitation-container');
+    if (recitationContainer) {
+        recitationContainer.addEventListener('contextmenu', (e) => {
+            if (isRecitationSessionActive()) {
+                e.preventDefault();
+                showToast('⚠️ Chuột phải đã bị vô hiệu hóa trong bài thi!', 'warning');
+            }
+        });
+    }
+
     // Theme Toggle
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
