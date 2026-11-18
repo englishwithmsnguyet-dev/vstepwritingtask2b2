@@ -167,35 +167,18 @@ function resetLearningProgress() {
 
 // Save current recitation progress
 function saveCurrentRecitationProgress() {
-    if (!activeEssayTypeId) return;
-    try {
-        localStorage.setItem('vstep_b2_recitation_' + activeEssayTypeId, JSON.stringify({
-            currentQuestionIndex,
-            questionScores
-        }));
-    } catch (e) {}
+    // Luôn mặc định trả từ câu đầu của Mở bài khi mở mục Trả Bài
 }
 
-// Reset Recitation State and UI
+// Reset Recitation State and UI - Luôn mặc định trả từ câu đầu của Mở bài
 function resetRecitationUI(isRestart = false) {
-    if (isRestart === true && activeEssayTypeId) {
+    if (activeEssayTypeId) {
         try { localStorage.removeItem('vstep_b2_recitation_' + activeEssayTypeId); } catch (e) {}
     }
 
     activeQuestions = recitationQuestions[activeEssayTypeId] || [];
-    let savedProgress = null;
-    try {
-        const data = localStorage.getItem('vstep_b2_recitation_' + activeEssayTypeId);
-        if (data) savedProgress = JSON.parse(data);
-    } catch (e) {}
-
-    if (savedProgress && savedProgress.questionScores && savedProgress.questionScores.length === activeQuestions.length) {
-        currentQuestionIndex = savedProgress.currentQuestionIndex || 0;
-        questionScores = savedProgress.questionScores;
-    } else {
-        currentQuestionIndex = 0;
-        questionScores = Array(activeQuestions.length).fill(0);
-    }
+    currentQuestionIndex = 0;
+    questionScores = Array(activeQuestions.length).fill(0);
     
     if (recitationInput) recitationInput.value = '';
     if (recitationFeedback) recitationFeedback.classList.add('hidden');
@@ -832,6 +815,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const tabId = e.currentTarget.dataset.tab;
             const panel = document.getElementById(`${tabId}Panel`);
             if (panel) panel.classList.add('active');
+
+            if (tabId === 'writingPractice') {
+                resetRecitationUI(true);
+            }
         });
     });
 
