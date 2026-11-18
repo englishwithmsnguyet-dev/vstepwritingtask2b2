@@ -339,6 +339,39 @@ function dismissAntiCheatModal() {
     }
 }
 
+// Exit Recitation Session cleanly (e.g. if student accidentally entered Trả Bài)
+function exitRecitationSession(isAccidentalClick = false) {
+    if (isAccidentalClick) {
+        // Revert violation penalty since the student intended to exit
+        if (violationCount > 0) {
+            violationCount--;
+        }
+        dismissAntiCheatModal();
+    } else {
+        const confirmExit = confirm('Bạn có chắc chắn muốn THOÁT khỏi phiên Trả Bài không?\n\n• Tiến độ câu hỏi của bạn đã được tự động sao lưu.\n• Bạn sẽ quay lại tab Dàn ý chi tiết để ôn tập.');
+        if (!confirmExit) return;
+    }
+
+    stopRecitationTimer();
+    saveCurrentRecitationProgress();
+
+    // Temporarily hide quiz box so isRecitationSessionActive() returns false
+    if (recitationQuizBox) {
+        recitationQuizBox.classList.add('hidden');
+    }
+
+    // Switch back to detailedOutline tab (or basicInfo if missing)
+    const outlineTabBtn = document.querySelector('.tab-btn[data-tab="detailedOutline"]');
+    if (outlineTabBtn) {
+        outlineTabBtn.click();
+    } else {
+        const firstTabBtn = document.querySelector('.tab-btn[data-tab="basicInfo"]');
+        if (firstTabBtn) firstTabBtn.click();
+    }
+
+    showToast('Đã thoát khỏi phiên Trả Bài thành công!', 'info');
+}
+
 function getStudentDisplayInfo() {
     try {
         const saved = JSON.parse(localStorage.getItem('vstep_student_info') || '{}');
@@ -1149,6 +1182,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnDismissAntiCheat = document.getElementById('btnDismissAntiCheat');
     if (btnDismissAntiCheat) {
         btnDismissAntiCheat.addEventListener('click', dismissAntiCheatModal);
+    }
+
+    // Exit Recitation button in header
+    const btnExitRecitation = document.getElementById('btnExitRecitation');
+    if (btnExitRecitation) {
+        btnExitRecitation.addEventListener('click', () => exitRecitationSession(false));
+    }
+
+    // Modal Exit Recitation button ("Tôi lỡ bấm nhầm vào Trả bài")
+    const btnModalExitRecitation = document.getElementById('btnModalExitRecitation');
+    if (btnModalExitRecitation) {
+        btnModalExitRecitation.addEventListener('click', () => exitRecitationSession(true));
     }
 
     document.addEventListener('keydown', (e) => {

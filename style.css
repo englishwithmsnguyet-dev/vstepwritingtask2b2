@@ -2045,6 +2045,93 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(0);
 }
 
+.anti-cheat-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-anti-cheat-exit {
+    width: 100%;
+    padding: 12px 18px;
+    background: #f8fafc;
+    color: #475569;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Roboto Serif', Georgia, serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-anti-cheat-exit:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+    transform: translateY(-1px);
+}
+
+[data-theme="dark"] .btn-anti-cheat-exit {
+    background: #0f172a;
+    color: #94a3b8;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .btn-anti-cheat-exit:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: #fca5a5;
+    border-color: #ef4444;
+}
+
+/* Exit Recitation Button in Header */
+.btn-exit-recitation {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 16px;
+    background: #ffffff;
+    color: #dc2626;
+    border: 1.5px solid #fca5a5;
+    border-radius: 9999px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.btn-exit-recitation:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+    color: #991b1b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15);
+}
+
+.btn-exit-recitation:active {
+    transform: translateY(0);
+}
+
+[data-theme="dark"] .btn-exit-recitation {
+    background: #1e293b;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .btn-exit-recitation:hover {
+    background: rgba(220, 38, 38, 0.2);
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
 .evaluation-message {
     font-size: 16px;
     color: var(--text-main);

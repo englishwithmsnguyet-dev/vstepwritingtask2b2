@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHÒNG ÔN TẬP LUẬN B2 - ENGLISH WITH MISS NGUYET</title>
-    <link rel="stylesheet" href="style.css?v=5.8">
+    <link rel="stylesheet" href="style.css?v=5.9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,300..900;1,8..144,300..900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
@@ -276,6 +276,9 @@
                                             <div class="progress-bar-fill" id="progressBarFill" style="width: 10%;"></div>
                                         </div>
                                     </div>
+                                    <button type="button" class="btn-exit-recitation" id="btnExitRecitation" title="Thoát nếu lỡ bấm vào Trả bài">
+                                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Thoát
+                                    </button>
                                 </div>
                             </div>
 
@@ -393,13 +396,16 @@
             </div>
             <div class="anti-cheat-actions">
                 <button type="button" class="btn-anti-cheat-dismiss" id="btnDismissAntiCheat">
-                    <i class="fa-solid fa-check"></i> Tôi đã hiểu &amp; Cam kết làm bài trung thực
+                    <i class="fa-solid fa-check"></i> Tôi đã hiểu &amp; Tiếp tục làm bài
+                </button>
+                <button type="button" class="btn-anti-cheat-exit" id="btnModalExitRecitation">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Tôi lỡ bấm nhầm vào Trả bài (Thoát ra)
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="data.js?v=5.8"></script>
-    <script src="app.js?v=5.8"></script>
+    <script src="data.js?v=5.9"></script>
+    <script src="app.js?v=5.9"></script>
 </body>
 </html>
