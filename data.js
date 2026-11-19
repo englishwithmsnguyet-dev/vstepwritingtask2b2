@@ -43,187 +43,231 @@ const essayTypes = [
 
 const recitationQuestions = {
     "adv-disadv": [
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu chủ đề:",
-                    "target": "In recent years, [chủ đề] has become increasingly prevalent in modern society."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>1. MỞ BÀI<br>Viết câu khẳng định vấn đề có hai mặt (lợi và hại):",
-                    "target": "Although it brings certain benefits, there are also some negative aspects."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu mục đích bài viết:",
-                    "target": "This essay will examine both the advantages and disadvantages."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu chủ đoạn cho thân bài miêu tả thuận lợi:",
-                    "target": "On the one hand, [chủ đề] offers several advantages."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn lợi ích 1:",
-                    "target": "One major benefit is that [lợi ích 1]."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn lợi ích 2:",
-                    "target": "Another positive aspect is that [lợi ích 2]."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn lợi ích 3:",
-                    "target": "A further advantage to consider is that [lợi ích 3]."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu chủ đoạn cho thân bài miêu tả bất lợi:",
-                    "target": "On the other hand, there are some disadvantages that should be considered."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn bất lợi 1:",
-                    "target": "One possible drawback is that [bất lợi 1]."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn bất lợi 2:",
-                    "target": "Another negative aspect is that [bất lợi 2]."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn bất lợi 3:",
-                    "target": "A further concern is that [bất lợi 3]."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>3. KẾT BÀI<br>Viết câu Kết bài khẳng định chủ đề có cả hai mặt:",
-                    "target": "In conclusion, [chủ đề] has both positive and negative aspects that should not be overlooked."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>3. KẾT BÀI<br>Viết câu nhận xét về tác động của hạn chế tiềm ẩn:",
-                    "target": "While it offers certain benefits, its potential drawbacks may also have significant implications."
-            },
-            {
-                    "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>3. KẾT BÀI<br>Viết câu kết luận cần cân nhắc cân bằng cả hai khía cạnh:",
-                    "target": "Therefore, a balanced consideration of both aspects is essential."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu chủ đề:",
-                    "target": "In recent years, [chủ đề] has become increasingly prevalent in modern society."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>1. MỞ BÀI<br>Viết câu nêu dẫn đến nhiều lợi ích:",
-                    "target": "This has led to a range of benefits across different contexts."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu mục đích bài viết tập trung vào lợi ích:",
-                    "target": "This essay will focus on the main advantages associated with it."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>2. THÂN BÀI<br>Viết câu mở đầu Thân bài 1 (Lợi ích 1):",
-                    "target": "One major benefit is that [lợi ích 1]."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>2. THÂN BÀI<br>Viết câu mở đầu Thân bài 2 (Lợi ích 2):",
-                    "target": "Another positive aspect is that [lợi ích 2]."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>2. THÂN BÀI<br>Viết câu mở đầu Thân bài 3 (Lợi ích 3):",
-                    "target": "A further advantage is that [lợi ích 3]."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>3. KẾT BÀI<br>Viết câu Kết bài khẳng định chủ đề mang lại các lợi ích đáng chú ý:",
-                    "target": "In conclusion, [chủ đề] offers several notable advantages."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>3. KẾT BÀI<br>Viết câu nhận xét về ảnh hưởng tích cực đến cá nhân và xã hội:",
-                    "target": "These benefits can have a positive influence on individuals and society in various ways."
-            },
-            {
-                    "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>3. KẾT BÀI<br>Viết câu chốt lại tầm quan trọng trong đời sống hiện đại:",
-                    "target": "Overall, its positive contributions highlight the importance of [chủ đề] in modern life."
-            }
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu chủ đề:",
+            "target": "In recent years, [chủ đề] has become increasingly prevalent in modern society.",
+            "vn": "Trong những năm gần đây, [chủ đề] ngày càng trở nên phổ biến trong xã hội hiện đại."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>1. MỞ BÀI<br>Viết câu khẳng định vấn đề có hai mặt (lợi và hại):",
+            "target": "Although it brings certain benefits, there are also some negative aspects.",
+            "vn": "Mặc dù nó mang lại những lợi ích nhất định, nhưng cũng có một số khía cạnh tiêu cực."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu mục đích bài viết:",
+            "target": "This essay will examine both the advantages and disadvantages.",
+            "vn": "Bài luận này sẽ xem xét cả những thuận lợi và bất lợi."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu chủ đoạn cho thân bài miêu tả thuận lợi:",
+            "target": "On the one hand, [chủ đề] offers several advantages.",
+            "vn": "Một mặt, [chủ đề] mang lại một số thuận lợi."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn lợi ích 1:",
+            "target": "One major benefit is that [lợi ích 1].",
+            "vn": "Một lợi ích chính là [lợi ích 1]."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn lợi ích 2:",
+            "target": "Another positive aspect is that [lợi ích 2].",
+            "vn": "Một khía cạnh tích cực khác là [lợi ích 2]."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn lợi ích 3:",
+            "target": "A further advantage to consider is that [lợi ích 3].",
+            "vn": "Một lợi thế nữa cần xem xét là [lợi ích 3]."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu chủ đoạn cho thân bài miêu tả bất lợi:",
+            "target": "On the other hand, there are some disadvantages that should be considered.",
+            "vn": "Mặt khác, có một số bất lợi cần được xem xét."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn bất lợi 1:",
+            "target": "One possible drawback is that [bất lợi 1].",
+            "vn": "Một nhược điểm có thể xảy ra là [bất lợi 1]."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn bất lợi 2:",
+            "target": "Another negative aspect is that [bất lợi 2].",
+            "vn": "Một khía cạnh tiêu cực khác là [bất lợi 2]."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>2. THÂN BÀI<br>Viết câu dẫn bất lợi 3:",
+            "target": "A further concern is that [bất lợi 3].",
+            "vn": "Một mối lo ngại khác là [bất lợi 3]."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>3. KẾT BÀI<br>Viết câu Kết bài khẳng định chủ đề có cả hai mặt:",
+            "target": "In conclusion, [chủ đề] has both positive and negative aspects that should not be overlooked.",
+            "vn": "Tóm lại, [chủ đề] có cả những khía cạnh tích cực và tiêu cực mà không nên bỏ qua."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>3. KẾT BÀI<br>Viết câu nhận xét về tác động của hạn chế tiềm ẩn:",
+            "target": "While it offers certain benefits, its potential drawbacks may also have significant implications.",
+            "vn": "Mặc dù nó mang lại những lợi ích nhất định, nhưng những hạn chế tiềm ẩn của nó cũng có thể để lại những tác động đáng kể."
+        },
+        {
+            "cue": "[DÀN Ý 01 - THUẬN LỢI & BẤT LỢI]<br>3. KẾT BÀI<br>Viết câu kết luận cần cân nhắc cân bằng cả hai khía cạnh:",
+            "target": "Therefore, a balanced consideration of both aspects is essential.",
+            "vn": "Vì vậy, việc cân nhắc cân bằng cả hai khía cạnh là rất cần thiết."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu chủ đề:",
+            "target": "In recent years, [chủ đề] has become increasingly prevalent in modern society.",
+            "vn": "Trong những năm gần đây, [chủ đề] ngày càng trở nên phổ biến trong xã hội hiện đại."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>1. MỞ BÀI<br>Viết câu nêu dẫn đến nhiều lợi ích:",
+            "target": "This has led to a range of benefits across different contexts.",
+            "vn": "Điều này đã dẫn đến một loạt các lợi ích trong nhiều bối cảnh khác nhau."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>1. MỞ BÀI<br>Viết câu giới thiệu mục đích bài viết tập trung vào lợi ích:",
+            "target": "This essay will focus on the main advantages associated with it.",
+            "vn": "Bài luận này sẽ tập trung vào những lợi ích chính liên quan đến nó."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>2. THÂN BÀI<br>Viết câu mở đầu Thân bài 1 (Lợi ích 1):",
+            "target": "One major benefit is that [lợi ích 1].",
+            "vn": "Một lợi ích chính là [lợi ích 1]."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>2. THÂN BÀI<br>Viết câu mở đầu Thân bài 2 (Lợi ích 2):",
+            "target": "Another positive aspect is that [lợi ích 2].",
+            "vn": "Một khía cạnh tích cực khác là [lợi ích 2]."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>2. THÂN BÀI<br>Viết câu mở đầu Thân bài 3 (Lợi ích 3):",
+            "target": "A further advantage is that [lợi ích 3].",
+            "vn": "Một lợi thế nữa là [lợi ích 3]."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>3. KẾT BÀI<br>Viết câu Kết bài khẳng định chủ đề mang lại các lợi ích đáng chú ý:",
+            "target": "In conclusion, [chủ đề] offers several notable advantages.",
+            "vn": "Tóm lại, [chủ đề] mang lại một số lợi ích đáng chú ý."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>3. KẾT BÀI<br>Viết câu nhận xét về ảnh hưởng tích cực đến cá nhân và xã hội:",
+            "target": "These benefits can have a positive influence on individuals and society in various ways.",
+            "vn": "Những lợi ích này có thể tạo ra ảnh hưởng tích cực đến cá nhân và xã hội theo nhiều cách khác nhau."
+        },
+        {
+            "cue": "[DÀN Ý 02 - CHỈ THUẬN LỢI]<br>3. KẾT BÀI<br>Viết câu chốt lại tầm quan trọng trong đời sống hiện đại:",
+            "target": "Overall, its positive contributions highlight the importance of [chủ đề] in modern life.",
+            "vn": "Nhìn chung, những đóng góp tích cực của nó nêu bật tầm quan trọng của [chủ đề] trong cuộc sống hiện đại."
+        }
     ],
-        "cause-effect": [
+    "cause-effect": [
         {
             "cue": "[NGUYÊN NHÂN & GIẢI PHÁP]<br>1. MỞ BÀI<br>Viết câu dẫn dắt chủ đề:",
-            "target": "In recent years, [chủ đề] has become a growing concern in many parts of the world."
+            "target": "In recent years, [chủ đề] has become a growing concern in many parts of the world.",
+            "vn": "Trong những năm gần đây, [chủ đề] đã trở thành một mối lo ngại ngày càng tăng ở nhiều nơi trên thế giới."
         },
         {
             "cue": "[NGUYÊN NHÂN & GIẢI PHÁP]<br>1. MỞ BÀI<br>Viết câu nêu mức độ nghiêm trọng:",
-            "target": "This issue has created several challenges for both individuals and society."
+            "target": "This issue has created several challenges for both individuals and society.",
+            "vn": "Vấn đề này đã tạo ra một số thách thức cho cả cá nhân và xã hội."
         },
         {
             "cue": "[NGUYÊN NHÂN & GIẢI PHÁP]<br>1. MỞ BÀI<br>Viết câu giới thiệu mục đích bài viết:",
-            "target": "This essay will examine the main causes of this problem and suggest possible solutions."
+            "target": "This essay will examine the main causes of this problem and suggest possible solutions.",
+            "vn": "Bài luận này sẽ xem xét những nguyên nhân chính của vấn đề này và đề xuất các giải pháp khả thi."
         },
         {
             "cue": "[NGUYÊN NHÂN & GIẢI PHÁP]<br>2. THÂN BÀI<br>Viết câu chủ đoạn Nguyên Nhân:",
-            "target": "This issue can be attributed to several key factors."
+            "target": "This issue can be attributed to several key factors.",
+            "vn": "Vấn đề này có thể bắt nguồn từ một số yếu tố chính."
         },
         {
             "cue": "[NGUYÊN NHÂN & GIẢI PHÁP]<br>2. THÂN BÀI<br>Viết câu chủ đoạn Ảnh Hưởng:",
-            "target": "This problem can lead to several significant consequences."
+            "target": "This problem can lead to several significant consequences.",
+            "vn": "Vấn đề này có thể dẫn đến một số hệ quả đáng kể."
         },
         {
             "cue": "[NGUYÊN NHÂN & GIẢI PHÁP]<br>2. THÂN BÀI<br>Viết câu chủ đoạn Giải Pháp:",
-            "target": "To address this problem, several practical solutions can be implemented."
+            "target": "To address this problem, several practical solutions can be implemented.",
+            "vn": "Để giải quyết vấn đề này, một số giải pháp thiết thực có thể được thực hiện."
         },
         {
             "cue": "[NGUYÊN NHÂN & GIẢI PHÁP]<br>3. KẾT BÀI<br>Viết câu tóm tắt:",
-            "target": "In conclusion, [chủ đề] is caused by several factors and requires practical solutions to address it effectively."
+            "target": "In conclusion, [chủ đề] is caused by several factors and requires practical solutions to address it effectively.",
+            "vn": "Tóm lại, [chủ đề] được gây ra bởi một số yếu tố và đòi hỏi các giải pháp thiết thực để giải quyết nó một cách hiệu quả."
         }
     ],
     "opinion": [
         {
             "cue": "[OPINION ESSAY]<br>1. MỞ BÀI<br>Viết câu giới thiệu chủ đề:",
-            "target": "In recent years, the idea that [quan điểm] has attracted considerable public attention and discussion."
+            "target": "In recent years, the idea that [quan điểm] has attracted considerable public attention and discussion.",
+            "vn": "Trong những năm gần đây, ý kiến cho rằng [quan điểm] đã thu hút sự chú ý và thảo luận đáng kể của dư luận."
         },
         {
             "cue": "[OPINION ESSAY]<br>1. MỞ BÀI<br>Viết câu nêu lập trường cá nhân:",
-            "target": "From my perspective, I completely agree / disagree with this opinion for several important reasons."
+            "target": "From my perspective, I completely agree / disagree with this opinion for several important reasons.",
+            "vn": "Theo quan điểm của tôi, tôi hoàn toàn đồng ý / không đồng ý với ý kiến này vì một số lý do quan trọng."
         },
         {
             "cue": "[OPINION ESSAY]<br>1. MỞ BÀI<br>Viết câu giới thiệu nội dung bài viết:",
-            "target": "This essay will present the main arguments supporting my viewpoint."
+            "target": "This essay will present the main arguments supporting my viewpoint.",
+            "vn": "Bài luận này sẽ trình bày những lập luận chính ủng hộ quan điểm của tôi."
         },
         {
             "cue": "[OPINION ESSAY]<br>2. THÂN BÀI<br>Viết câu luận điểm 1:",
-            "target": "The first reason why I agree / disagree with this opinion is that [lý do 1]."
+            "target": "The first reason why I agree / disagree with this opinion is that [lý do 1].",
+            "vn": "Lý do đầu tiên khiến tôi đồng ý / không đồng ý với ý kiến này là [lý do 1]."
         },
         {
             "cue": "[OPINION ESSAY]<br>2. THÂN BÀI<br>Viết câu luận điểm 2:",
-            "target": "Another important reason is that [lý do 2]."
+            "target": "Another important reason is that [lý do 2].",
+            "vn": "Một lý do quan trọng khác là [lý do 2]."
         },
         {
             "cue": "[OPINION ESSAY]<br>2. THÂN BÀI<br>Viết câu luận điểm 3:",
-            "target": "A further reason supporting my viewpoint is that [lý do 3]."
+            "target": "A further reason supporting my viewpoint is that [lý do 3].",
+            "vn": "Một lý do nữa ủng hộ quan điểm của tôi là [lý do 3]."
         },
         {
             "cue": "[OPINION ESSAY]<br>3. KẾT BÀI<br>Viết câu khẳng định lại lập trường:",
-            "target": "In conclusion, I strongly agree / disagree with the idea that [quan điểm]."
+            "target": "In conclusion, I strongly agree / disagree with the idea that [quan điểm].",
+            "vn": "Tóm lại, tôi mạnh mẽ đồng ý / không đồng ý với ý kiến cho rằng [quan điểm]."
         }
     ],
     "discussion": [
         {
             "cue": "[DISCUSSION ESSAY]<br>1. MỞ BÀI<br>Viết câu giới thiệu chủ đề:",
-            "target": "In recent years, [chủ đề] has become a subject of considerable debate."
+            "target": "In recent years, [chủ đề] has become a subject of considerable debate.",
+            "vn": "Trong những năm gần đây, [chủ đề] đã trở thành một chủ đề gây nhiều tranh luận."
         },
         {
             "cue": "[DISCUSSION ESSAY]<br>1. MỞ BÀI<br>Viết câu nêu 2 quan điểm:",
-            "target": "Some people believe that [ý kiến 1], while others argue that [ý kiến 2]."
+            "target": "Some people believe that [ý kiến 1], while others argue that [ý kiến 2].",
+            "vn": "Một số người tin rằng [ý kiến 1], trong khi những người khác cho rằng [ý kiến 2]."
         },
         {
             "cue": "[DISCUSSION ESSAY]<br>1. MỞ BÀI<br>Viết câu giới thiệu nội dung bài:",
-            "target": "This essay will discuss both perspectives and present my personal viewpoint."
+            "target": "This essay will discuss both perspectives and present my personal viewpoint.",
+            "vn": "Bài luận này sẽ thảo luận cả hai góc nhìn và trình bày quan điểm cá nhân của tôi."
         },
         {
             "cue": "[DISCUSSION ESSAY]<br>2. THÂN BÀI<br>Viết câu chủ đoạn phân tích ý kiến 1:",
-            "target": "On the one hand, it is argued that [ý kiến 1]."
+            "target": "On the one hand, it is argued that [ý kiến 1].",
+            "vn": "Một mặt, người ta lập luận rằng [ý kiến 1]."
         },
         {
             "cue": "[DISCUSSION ESSAY]<br>2. THÂN BÀI<br>Viết câu chủ đoạn phân tích ý kiến 2:",
-            "target": "On the other hand, it is believed that [ý kiến 2]."
+            "target": "On the other hand, it is believed that [ý kiến 2].",
+            "vn": "Mặt khác, người ta tin rằng [ý kiến 2]."
         },
         {
             "cue": "[DISCUSSION ESSAY]<br>3. KẾT BÀI<br>Viết câu kết luận khách quan:",
-            "target": "In conclusion, both sides of the argument present valid points."
+            "target": "In conclusion, both sides of the argument present valid points.",
+            "vn": "Tóm lại, cả hai phía của cuộc tranh luận đều đưa ra những quan điểm hợp lý."
         },
         {
             "cue": "[DISCUSSION ESSAY]<br>3. KẾT BÀI<br>Viết câu chốt lại quan điểm cá nhân:",
-            "target": "However, I personally believe that [quan điểm cá nhân] because [lý do ngắn gọn]."
+            "target": "However, I personally believe that [quan điểm cá nhân] because [lý do ngắn gọn].",
+            "vn": "Tuy nhiên, cá nhân tôi tin rằng [quan điểm cá nhân] bởi vì [lý do ngắn gọn]."
         }
     ]
 };
