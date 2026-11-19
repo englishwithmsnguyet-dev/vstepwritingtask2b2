@@ -1478,81 +1478,69 @@ function handleLogin() {
     const cleanedPwd = cleanAccessPassword(passwordVal);
     const isValidPassword = ['STUDYHARD', 'VSTEPSEPTEMBER', 'VSTEPWRITING', 'VSTEOWRITING', 'PRACTICEWRITING', 'PTMN'].includes(cleanedPwd);
 
-    const isTeacherRole = (
-        normName === 'PTMN' ||
-        noToneName.includes('co nguyet') ||
-        noToneName.includes('miss nguyet') ||
-        noToneName.includes('pham thi minh nguyet') ||
-        finalClassVal === 'GV' ||
-        cleanedPwd === 'PTMN'
-    );
+    // 1. Kiểm tra mật khẩu
+    if (!passwordVal) {
+        showLoginError('Vui lòng nhập Mật khẩu.');
+        if (studentPasswordInput) studentPasswordInput.focus();
+        return;
+    }
+
+    if (!isValidPassword) {
+        showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
+        if (studentPasswordInput) {
+            studentPasswordInput.focus();
+            studentPasswordInput.select();
+        }
+        return;
+    }
+
+    // 2. Kiểm tra lớp hợp lệ
+    if (!finalClassVal || !ALLOWED_CLASSES.includes(finalClassVal)) {
+        showLoginError('Hệ thống hiện chỉ mở cho các lớp: CB210, CB211, CB213, ONB103, B212 và Gia Tuệ (B2)!');
+        if (studentClassInput) studentClassInput.focus();
+        return;
+    }
 
     let finalStudentName = nameVal;
 
-    if (isTeacherRole) {
-        if (!finalClassVal) finalClassVal = 'GV';
-        if (finalClassVal === 'GV') {
-            finalStudentName = 'Cô Nguyệt (PTMN)';
-        } else {
-            finalStudentName = nameVal || 'Cô Nguyệt';
-        }
-        if (!isValidPassword) {
-            showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
-            if (studentPasswordInput) {
-                studentPasswordInput.focus();
-                studentPasswordInput.select();
-            }
+    // 3. Phân biệt Giáo viên và Học viên theo danh sách lớp
+    if (finalClassVal === 'GV') {
+        const isTeacher = (
+            normName === 'PTMN' ||
+            noToneName.includes('co nguyet') ||
+            noToneName.includes('miss nguyet') ||
+            noToneName.includes('pham thi minh nguyet') ||
+            cleanedPwd === 'PTMN'
+        );
+        if (!isTeacher) {
+            showLoginError('Mã lớp GV chỉ dành riêng cho Giáo viên.');
+            if (studentNameInput) studentNameInput.focus();
             return;
         }
-    } else {
-        if (!finalClassVal || !ALLOWED_CLASSES.includes(finalClassVal)) {
-            showLoginError('Hệ thống hiện chỉ mở cho các lớp: CB210, CB211, CB213, ONB103, B212 và Gia Tuệ (B2)!');
-            if (studentClassInput) studentClassInput.focus();
-            return;
-        }
-
+        finalStudentName = 'Cô Nguyệt (PTMN)';
+    } else if (finalClassVal === 'B2') {
         const isGiaTue = noToneName.includes('gia tue') || noToneName.replace(/\s+/g, '').includes('giatue');
-        if (finalClassVal === 'B2') {
-            if (!isGiaTue) {
-                showLoginError('Mã lớp B2 hiện chỉ dành riêng cho học viên Gia Tuệ (B2)!');
-                if (studentNameInput) studentNameInput.focus();
-                return;
-            }
-            finalStudentName = 'Gia Tuệ';
-        } else {
-            const roster = STUDENTS_BY_CLASS[finalClassVal] || [];
-            const normInp = normalizeNameB2(nameVal);
-            const matched = roster.find(st => {
-                const nSt = normalizeNameB2(st);
-                return nSt === normInp || removeVietnameseTonesB2(nSt) === noToneName;
-            });
-
-            if (matched) {
-                finalStudentName = matched;
-            } else if (finalClassVal === 'B212' && isGiaTue) {
-                finalStudentName = 'Gia Tuệ';
-                finalClassVal = 'B2';
-            } else {
-                showLoginError(`Họ và tên "${nameVal}" không có trong danh sách lớp ${finalClassVal}.`);
-                if (studentNameInput) studentNameInput.focus();
-                return;
-            }
-        }
-
-        if (!passwordVal) {
-            showLoginError('Vui lòng nhập Mật khẩu.');
-            if (studentPasswordInput) studentPasswordInput.focus();
+        if (!isGiaTue) {
+            showLoginError('Mã lớp B2 hiện chỉ dành riêng cho học viên Gia Tuệ (B2)!');
+            if (studentNameInput) studentNameInput.focus();
             return;
         }
+        finalStudentName = 'Gia Tuệ';
+    } else {
+        // Bắt buộc kiểm tra tên trong danh sách lớp chính thức (B212, CB210, CB211, CB213, ONB103)
+        const roster = STUDENTS_BY_CLASS[finalClassVal] || [];
+        const normInp = normalizeNameB2(nameVal);
+        const matched = roster.find(st => {
+            const nSt = normalizeNameB2(st);
+            return nSt === normInp || removeVietnameseTonesB2(nSt) === noToneName;
+        });
 
-        if (!isValidPassword) {
-            showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
-            if (studentPasswordInput) {
-                studentPasswordInput.focus();
-                studentPasswordInput.select();
-            }
+        if (!matched) {
+            showLoginError(`Họ và tên "${nameVal}" không có trong danh sách lớp ${finalClassVal}. Vui lòng nhập đúng họ tên theo danh sách lớp!`);
+            if (studentNameInput) studentNameInput.focus();
             return;
         }
+        finalStudentName = matched;
     }
 
     if (loginError) loginError.style.display = 'none';
