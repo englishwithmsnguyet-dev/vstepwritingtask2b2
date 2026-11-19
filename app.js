@@ -1352,7 +1352,8 @@ function cleanAccessPassword(pwd) {
         .replace(/\s+/g, '')
         .replace(/Ư/g, 'W')
         .replace(/Ơ/g, 'OW')
-        .replace(/Ê/g, 'E');
+        .replace(/Ê/g, 'E')
+        .replace(/Ả/g, 'AR');
 }
 
 function initLoginState() {
@@ -1475,7 +1476,7 @@ function handleLogin() {
     }
 
     const cleanedPwd = cleanAccessPassword(passwordVal);
-    const isValidPassword = ['VSTEPSEPTEMBER', 'STUDYHARD', 'VSTEPWRITING', 'VSTEOWRITING', 'PRACTICEWRITING', 'PTMN'].includes(cleanedPwd);
+    const isValidPassword = ['STUDYHARD', 'VSTEPSEPTEMBER', 'VSTEPWRITING', 'VSTEOWRITING', 'PRACTICEWRITING', 'PTMN'].includes(cleanedPwd);
 
     const isTeacherRole = (
         normName === 'PTMN' ||
