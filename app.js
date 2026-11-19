@@ -768,19 +768,7 @@ function getUserClass() {
 }
 
 function isTeacherUser() {
-    const cls = getUserClass();
-    if (cls === 'GV') return true;
-    const b2Name = (localStorage.getItem('vstep_b2_student_name') || '').trim().toUpperCase();
-    if (b2Name === 'PTMN' || b2Name.includes('NGUYET')) return true;
-    try {
-        const saved = JSON.parse(localStorage.getItem('vstep_student_info'));
-        if (saved) {
-            const sCls = (saved.className || '').toUpperCase();
-            const sName = (saved.fullName || '').toUpperCase();
-            if (sCls === 'GV' || sName === 'PTMN' || sName.includes('NGUYET')) return true;
-        }
-    } catch (e) {}
-    return false;
+    return getUserClass() === 'GV';
 }
 
 function getTypeLockMessage(userClass) {
@@ -798,20 +786,23 @@ function getOutlineLockMessage(userClass) {
 }
 
 function isTypeLocked(typeId) {
-    if (isTeacherUser()) return false;
     const userClass = getUserClass();
+    if (userClass === 'GV') return false;
     if (userClass === 'B212') {
         return typeId !== 'adv-disadv';
     }
     if (['CB211', 'CB213', 'ONB103'].includes(userClass)) {
         return (typeId === 'opinion' || typeId === 'discussion');
     }
+    if (!userClass) {
+        return typeId !== 'adv-disadv';
+    }
     return false;
 }
 
 function isOutlineLocked(typeId, outlineIndex) {
-    if (isTeacherUser()) return false;
     const userClass = getUserClass();
+    if (userClass === 'GV') return false;
     if (userClass === 'B212') {
         if (typeId !== 'adv-disadv') return true;
         return false;
@@ -823,6 +814,9 @@ function isOutlineLocked(typeId, outlineIndex) {
         if (typeId === 'opinion' || typeId === 'discussion') {
             return true;
         }
+    }
+    if (!userClass && typeId !== 'adv-disadv') {
+        return true;
     }
     return false;
 }
@@ -1400,9 +1394,15 @@ function initLoginState() {
     if (isSessionLoggedIn === 'true') {
         loginOverlay.style.display = 'none';
         appContainer.style.display = 'flex';
+        if (isTypeLocked(activeEssayTypeId)) {
+            activeEssayTypeId = 'adv-disadv';
+        }
+        renderNav();
+        updateGlobalProgress();
     } else {
         loginOverlay.style.display = 'flex';
         appContainer.style.display = 'none';
+        renderNav();
     }
     updateStudentProfileCard();
 
@@ -1474,18 +1474,35 @@ function handleLogin() {
         finalClassVal = noToneClass;
     }
 
-    const isTeacher = (
+    const cleanedPwd = cleanAccessPassword(passwordVal);
+    const isValidPassword = ['VSTEPSEPTEMBER', 'STUDYHARD', 'VSTEPWRITING', 'VSTEOWRITING', 'PRACTICEWRITING', 'PTMN'].includes(cleanedPwd);
+
+    const isTeacherRole = (
         normName === 'PTMN' ||
         noToneName.includes('co nguyet') ||
         noToneName.includes('miss nguyet') ||
         noToneName.includes('pham thi minh nguyet') ||
         finalClassVal === 'GV' ||
-        cleanAccessPassword(passwordVal) === 'PTMN'
+        cleanedPwd === 'PTMN'
     );
-    let finalStudentName = isTeacher ? (nameVal || 'PTMN') : nameVal;
 
-    if (isTeacher) {
+    let finalStudentName = nameVal;
+
+    if (isTeacherRole) {
         if (!finalClassVal) finalClassVal = 'GV';
+        if (finalClassVal === 'GV') {
+            finalStudentName = 'Cô Nguyệt (PTMN)';
+        } else {
+            finalStudentName = nameVal || 'Cô Nguyệt';
+        }
+        if (!isValidPassword) {
+            showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
+            if (studentPasswordInput) {
+                studentPasswordInput.focus();
+                studentPasswordInput.select();
+            }
+            return;
+        }
     } else {
         if (!finalClassVal || !ALLOWED_CLASSES.includes(finalClassVal)) {
             showLoginError('Hệ thống hiện chỉ mở cho các lớp: CB210, CB211, CB213, ONB103, B212 và Gia Tuệ (B2)!');
@@ -1527,8 +1544,7 @@ function handleLogin() {
             return;
         }
 
-        const cleanedPwd = cleanAccessPassword(passwordVal);
-        if (!['STUDYHARD', 'VSTEPWRITING', 'VSTEOWRITING', 'PRACTICEWRITING', 'PTMN'].includes(cleanedPwd)) {
+        if (!isValidPassword) {
             showLoginError('Mật khẩu không đúng. Vui lòng kiểm tra lại!');
             if (studentPasswordInput) {
                 studentPasswordInput.focus();
@@ -1571,13 +1587,13 @@ function handleLogin() {
     } catch (e) {}
 
     // Save info
-    localStorage.setItem('vstep_b2_student_name', isTeacher ? 'PTMN' : nameVal);
+    localStorage.setItem('vstep_b2_student_name', finalStudentName);
     localStorage.setItem('vstep_b2_student_class', finalClassVal);
-    localStorage.setItem('vstep_b2_student_info', `${isTeacher ? 'PTMN' : nameVal} - Lớp ${finalClassVal}`);
+    localStorage.setItem('vstep_b2_student_info', `${finalStudentName} - Lớp ${finalClassVal}`);
     sessionStorage.setItem('current_user_class', finalClassVal);
     sessionStorage.setItem('vstep_b2_student_class', finalClassVal);
     sessionStorage.setItem('vstep_b2_session_logged_in', 'true');
-    updateStudentProfileCard(isTeacher ? 'Cô Nguyệt (PTMN)' : nameVal, finalClassVal);
+    updateStudentProfileCard(finalStudentName, finalClassVal);
 
     // If currently selected essay type is locked for this class, switch to adv-disadv
     if (isTypeLocked(activeEssayTypeId)) {
@@ -1605,9 +1621,9 @@ function updateStudentProfileCard(name, cls) {
     const avatarIcon = document.getElementById('studentAvatarIcon');
     
     if (!name) name = localStorage.getItem('vstep_b2_student_name') || '';
-    if (!cls) cls = localStorage.getItem('vstep_b2_student_class') || '';
+    if (!cls) cls = getUserClass() || '';
     
-    const isTeacher = (cls === 'GV' || name === 'PTMN' || (cls && cls.toUpperCase() === 'GV'));
+    const isTeacher = (cls === 'GV');
     
     if (nameEl) {
         nameEl.textContent = name || 'Chưa đăng nhập';
@@ -1635,6 +1651,12 @@ window.reopenLoginOverlay = function() {
         localStorage.removeItem('vstep_b2_student_info');
         const loginOverlay = document.getElementById('loginOverlay');
         const appContainer = document.getElementById('appContainer');
+        const studentNameInput = document.getElementById('studentName');
+        const studentClassInput = document.getElementById('studentClass');
+        const studentPasswordInput = document.getElementById('studentPassword');
+        if (studentNameInput) studentNameInput.value = '';
+        if (studentClassInput) studentClassInput.value = '';
+        if (studentPasswordInput) studentPasswordInput.value = '';
         if (loginOverlay) loginOverlay.style.display = 'flex';
         if (appContainer) appContainer.style.display = 'none';
         updateStudentProfileCard('', '');
