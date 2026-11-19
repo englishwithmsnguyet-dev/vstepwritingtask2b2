@@ -376,6 +376,15 @@ function exitRecitationSession(isAccidentalClick = false) {
 }
 
 function getStudentDisplayInfo() {
+    const b2Name = localStorage.getItem('vstep_b2_student_name');
+    const b2Cls = localStorage.getItem('vstep_b2_student_class');
+    if (b2Name) {
+        return b2Cls ? `${b2Name} (${b2Cls})` : b2Name;
+    }
+    const sessionClass = sessionStorage.getItem('current_user_class') || sessionStorage.getItem('vstep_b2_student_class');
+    if (sessionClass) {
+        return `Học viên (${sessionClass})`;
+    }
     try {
         const saved = JSON.parse(localStorage.getItem('vstep_student_info') || '{}');
         if (saved && saved.fullName) {
@@ -385,49 +394,19 @@ function getStudentDisplayInfo() {
             return saved.fullName;
         }
     } catch (e) {}
-    const b2Name = localStorage.getItem('vstep_b2_student_name');
-    const b2Cls = localStorage.getItem('vstep_b2_student_class');
-    if (b2Name) {
-        return b2Cls ? `${b2Name} (${b2Cls})` : b2Name;
-    }
-    const sessionClass = sessionStorage.getItem('current_user_class');
-    if (sessionClass) {
-        return `Học viên (${sessionClass})`;
-    }
     return 'Học viên VSTEP B2';
 }
 
-// Reset Recitation State and UI - Supports Auto-Save restoration and fresh restart
+// Reset Recitation State and UI - Luôn bắt đầu từ câu đầu tiên của Mở bài
 function resetRecitationUI(isRestart = false) {
     activeQuestions = recitationQuestions[activeEssayTypeId] || [];
-    let restoredDraft = '';
 
-    if (isRestart) {
-        clearSavedRecitationProgress();
-        violationCount = 0;
-        currentQuestionIndex = 0;
-        questionScores = Array(activeQuestions.length).fill(0);
-        recitationTimeRemaining = RECITATION_TIME_LIMIT;
-    } else {
-        const saved = loadSavedRecitationProgress();
-        if (saved && typeof saved.questionIndex === 'number' && saved.questionIndex < activeQuestions.length) {
-            currentQuestionIndex = saved.questionIndex;
-            questionScores = (Array.isArray(saved.questionScores) && saved.questionScores.length === activeQuestions.length)
-                ? saved.questionScores
-                : Array(activeQuestions.length).fill(0);
-            recitationTimeRemaining = (typeof saved.timeRemaining === 'number' && saved.timeRemaining > 0)
-                ? saved.timeRemaining
-                : RECITATION_TIME_LIMIT;
-            violationCount = typeof saved.violationCount === 'number' ? saved.violationCount : 0;
-            restoredDraft = saved.userDraft || '';
-        } else {
-            clearSavedRecitationProgress();
-            violationCount = 0;
-            currentQuestionIndex = 0;
-            questionScores = Array(activeQuestions.length).fill(0);
-            recitationTimeRemaining = RECITATION_TIME_LIMIT;
-        }
-    }
+    // Luôn xoá tiến độ tạm và đưa câu hỏi về câu đầu tiên của Mở bài (Index 0)
+    clearSavedRecitationProgress();
+    violationCount = 0;
+    currentQuestionIndex = 0;
+    questionScores = Array(activeQuestions.length).fill(0);
+    recitationTimeRemaining = RECITATION_TIME_LIMIT;
     
     if (recitationInput) recitationInput.value = '';
     if (recitationFeedback) recitationFeedback.classList.add('hidden');
@@ -456,10 +435,6 @@ function resetRecitationUI(isRestart = false) {
     startRecitationTimer();
 
     showRecitationQuestion();
-
-    if (restoredDraft && recitationInput) {
-        recitationInput.value = restoredDraft;
-    }
 }
 
 // Show the current question
@@ -769,25 +744,43 @@ function showWelcomeScreen() {
 }
 
 // User Class & Permission Helpers
+function getUserClass() {
+    // 1. Direct B2 student class from localStorage
+    const b2Cls = localStorage.getItem('vstep_b2_student_class');
+    if (b2Cls && b2Cls.trim()) return b2Cls.trim().toUpperCase();
+
+    // 2. Direct session class
+    const sessionCls = sessionStorage.getItem('current_user_class') || sessionStorage.getItem('vstep_b2_student_class');
+    if (sessionCls && sessionCls.trim()) return sessionCls.trim().toUpperCase();
+
+    // 3. String format in vstep_b2_student_info ("Tên - Lớp B212")
+    const b2Info = localStorage.getItem('vstep_b2_student_info') || '';
+    const match = b2Info.match(/Lớp\s+([A-Za-z0-9]+)/i);
+    if (match) return match[1].trim().toUpperCase();
+
+    // 4. Fallback legacy / shared JSON in vstep_student_info
+    try {
+        const saved = JSON.parse(localStorage.getItem('vstep_student_info'));
+        if (saved && saved.className) return saved.className.trim().toUpperCase();
+    } catch (e) {}
+
+    return '';
+}
+
 function isTeacherUser() {
+    const cls = getUserClass();
+    if (cls === 'GV') return true;
+    const b2Name = (localStorage.getItem('vstep_b2_student_name') || '').trim().toUpperCase();
+    if (b2Name === 'PTMN' || b2Name.includes('NGUYET')) return true;
     try {
         const saved = JSON.parse(localStorage.getItem('vstep_student_info'));
         if (saved) {
-            const cls = (saved.className || '').toUpperCase();
-            const name = (saved.fullName || '').toUpperCase();
-            if (cls === 'GV' || name === 'PTMN') return true;
+            const sCls = (saved.className || '').toUpperCase();
+            const sName = (saved.fullName || '').toUpperCase();
+            if (sCls === 'GV' || sName === 'PTMN' || sName.includes('NGUYET')) return true;
         }
     } catch (e) {}
-    const curCls = (sessionStorage.getItem('current_user_class') || '').toUpperCase();
-    return curCls === 'GV';
-}
-
-function getUserClass() {
-    try {
-        const saved = JSON.parse(localStorage.getItem('vstep_student_info'));
-        if (saved && saved.className) return saved.className.toUpperCase();
-    } catch (e) {}
-    return (sessionStorage.getItem('current_user_class') || '').toUpperCase();
+    return false;
 }
 
 function getTypeLockMessage(userClass) {
@@ -1121,6 +1114,11 @@ document.addEventListener('DOMContentLoaded', () => {
     recitationCountdown = document.getElementById('recitationCountdown');
     timeSpentVal = document.getElementById('timeSpentVal');
 
+    // Ensure activeEssayTypeId is valid for current user
+    if (isTypeLocked(activeEssayTypeId)) {
+        activeEssayTypeId = 'adv-disadv';
+    }
+
     // Render navigation
     renderNav();
 
@@ -1156,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (panel) panel.classList.add('active');
 
             if (tabId === 'writingPractice') {
-                resetRecitationUI(false);
+                resetRecitationUI(true);
             }
         });
     });
@@ -1576,8 +1574,19 @@ function handleLogin() {
     localStorage.setItem('vstep_b2_student_name', isTeacher ? 'PTMN' : nameVal);
     localStorage.setItem('vstep_b2_student_class', finalClassVal);
     localStorage.setItem('vstep_b2_student_info', `${isTeacher ? 'PTMN' : nameVal} - Lớp ${finalClassVal}`);
+    sessionStorage.setItem('current_user_class', finalClassVal);
+    sessionStorage.setItem('vstep_b2_student_class', finalClassVal);
     sessionStorage.setItem('vstep_b2_session_logged_in', 'true');
     updateStudentProfileCard(isTeacher ? 'Cô Nguyệt (PTMN)' : nameVal, finalClassVal);
+
+    // If currently selected essay type is locked for this class, switch to adv-disadv
+    if (isTypeLocked(activeEssayTypeId)) {
+        activeEssayTypeId = 'adv-disadv';
+    }
+
+    // Refresh navigation to immediately reflect lock states for this class
+    renderNav();
+    updateGlobalProgress();
 
     // Unlock App
     setTimeout(() => {
@@ -1619,11 +1628,17 @@ function updateStudentProfileCard(name, cls) {
 window.reopenLoginOverlay = function() {
     if (confirm('Bạn có muốn đăng xuất và đổi thông tin tài khoản không?')) {
         sessionStorage.removeItem('vstep_b2_session_logged_in');
+        sessionStorage.removeItem('current_user_class');
+        sessionStorage.removeItem('vstep_b2_student_class');
+        localStorage.removeItem('vstep_b2_student_class');
+        localStorage.removeItem('vstep_b2_student_name');
+        localStorage.removeItem('vstep_b2_student_info');
         const loginOverlay = document.getElementById('loginOverlay');
         const appContainer = document.getElementById('appContainer');
         if (loginOverlay) loginOverlay.style.display = 'flex';
         if (appContainer) appContainer.style.display = 'none';
         updateStudentProfileCard('', '');
+        renderNav();
     }
 };
 
