@@ -119,9 +119,12 @@ function markEssayCompleted(id) {
 function updateGlobalProgress() {
     const completed = getCompletedEssays();
     const userClass = getUserClass();
-    const isRestricted = ['CB211', 'CB213', 'ONB103'].includes(userClass);
-    const total = isRestricted ? 2 : 4;
-    const validCompleted = isRestricted ? completed.filter(id => id === 'adv-disadv' || id === 'cause-effect') : completed;
+    const isSingleTypeClass = (userClass === 'B212');
+    const isTwoTypeClass = ['CB211', 'CB213', 'ONB103'].includes(userClass);
+    const total = isSingleTypeClass ? 1 : (isTwoTypeClass ? 2 : 4);
+    const validCompleted = isSingleTypeClass
+        ? completed.filter(id => id === 'adv-disadv')
+        : (isTwoTypeClass ? completed.filter(id => id === 'adv-disadv' || id === 'cause-effect') : completed);
     const count = validCompleted.length;
     const percent = Math.round((count / total) * 100);
 
@@ -143,7 +146,7 @@ function updateGlobalProgress() {
         if (count === 0) {
             dashStatus.textContent = "Chưa hoàn thành dạng bài nào. Hãy bắt đầu học tập!";
         } else if (count === total) {
-            dashStatus.textContent = isRestricted
+            dashStatus.textContent = (isSingleTypeClass || isTwoTypeClass)
                 ? "🎉 TUYỆT VỜI! Bạn đã xuất sắc hoàn thành các dạng bài được mở cho lớp của mình!"
                 : "🎉 TUYỆT VỜI! Bạn đã xuất sắc chinh phục tất cả 4 dạng luận VSTEP Writing Task 02!";
         } else {
@@ -787,9 +790,26 @@ function getUserClass() {
     return (sessionStorage.getItem('current_user_class') || '').toUpperCase();
 }
 
+function getTypeLockMessage(userClass) {
+    if (userClass === 'B212') {
+        return `🔒 Dạng luận này tạm thời chưa mở cho lớp ${userClass}. Lớp hiện mở dạng luận TYPE 01!`;
+    }
+    return `🔒 Dạng luận này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dạng 01 và 2 dàn ý đầu của Dạng 02!`;
+}
+
+function getOutlineLockMessage(userClass) {
+    if (userClass === 'B212') {
+        return `🔒 Dàn ý này tạm thời chưa mở cho lớp ${userClass}. Lớp hiện mở dạng luận TYPE 01!`;
+    }
+    return `🔒 Dàn ý này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dàn ý 01 và 2 dàn ý đầu của Dạng 02!`;
+}
+
 function isTypeLocked(typeId) {
     if (isTeacherUser()) return false;
     const userClass = getUserClass();
+    if (userClass === 'B212') {
+        return typeId !== 'adv-disadv';
+    }
     if (['CB211', 'CB213', 'ONB103'].includes(userClass)) {
         return (typeId === 'opinion' || typeId === 'discussion');
     }
@@ -799,6 +819,10 @@ function isTypeLocked(typeId) {
 function isOutlineLocked(typeId, outlineIndex) {
     if (isTeacherUser()) return false;
     const userClass = getUserClass();
+    if (userClass === 'B212') {
+        if (typeId !== 'adv-disadv') return true;
+        return false;
+    }
     if (['CB211', 'CB213', 'ONB103'].includes(userClass)) {
         if (typeId === 'cause-effect') {
             return outlineIndex >= 2; // Only first 2 outlines (index 0 and 1) are unlocked
@@ -898,7 +922,7 @@ function renderNav() {
             }
             if (isTypeLocked(type.id)) {
                 const userClass = getUserClass();
-                showToast(`🔒 Dạng luận này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dạng 01 và 2 dàn ý đầu của Dạng 02!`, 'warning');
+                showToast(getTypeLockMessage(userClass), 'warning');
                 return;
             }
             selectEssayType(type.id);
@@ -973,7 +997,7 @@ function setupVariantTabs(container, itemSelector = '.outline-variant', defaultP
         btn.addEventListener('click', () => {
             if (isOutlineLocked(activeEssayTypeId, index)) {
                 const userClass = getUserClass();
-                showToast(`🔒 Dàn ý này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dàn ý 01 và 2 dàn ý đầu của Dạng 02!`, 'warning');
+                showToast(getOutlineLockMessage(userClass), 'warning');
                 return;
             }
             nav.querySelectorAll('.outline-variant-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1013,7 +1037,7 @@ function setupVariantTabs(container, itemSelector = '.outline-variant', defaultP
 function selectEssayType(id) {
     if (isTypeLocked(id)) {
         const userClass = getUserClass();
-        showToast(`🔒 Dạng luận này tạm thời chưa mở cho lớp ${userClass || 'của bạn'}. Lớp hiện mở Dạng 01 và 2 dàn ý đầu của Dạng 02!`, 'warning');
+        showToast(getTypeLockMessage(userClass), 'warning');
         return;
     }
     activeEssayTypeId = id;
